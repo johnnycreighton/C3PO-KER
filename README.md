@@ -14,4 +14,4 @@ such as
 
 Original idea was to play heads up hands with a stack of 10,000, (stacks regenerate to 10,000 after every hand).
 
-Dependancises Bluffin-Muffin Hand Evaluator.
+Dependancises BluffinMuffin.HandEvaluator
