@@ -1,0 +1,7 @@
+D:\4th Year CSSE\Samus\Samus\bin\Debug\Samus.exe.config
+D:\4th Year CSSE\Samus\Samus\bin\Debug\Samus.exe
+D:\4th Year CSSE\Samus\Samus\bin\Debug\Samus.pdb
+D:\4th Year CSSE\Samus\Samus\bin\Debug\BluffinMuffin.HandEvaluator.dll
+D:\4th Year CSSE\Samus\Samus\obj\Debug\Samus.csproj.CoreCompileInputs.cache
+D:\4th Year CSSE\Samus\Samus\obj\Debug\Samus.exe
+D:\4th Year CSSE\Samus\Samus\obj\Debug\Samus.pdb
