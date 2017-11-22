@@ -6,31 +6,35 @@ using System.Threading.Tasks;
 
 namespace Samus
 {
-    class Player
+    public class Player
     {
-        public static long Stack = 10000;
+        public int Stack = 10000;
+        public int Rank;
+        public bool AllIn;
         public string Name;
         public Card FirstCard;
         public Card SecondCard;
-        public Card[] WholeCards;
-        public bool button = false;
-        
+        public bool Button;
+        public bool Fold;
 
 
         public Player(String name)
         {
-            this.Name = name;
-            WholeCards = new Card[2];
-            
+            this.Name = name; 
         }
-        public void SetFirstCard(Card card)
+        public void PayPot(int amount)
         {
-            this.WholeCards[0] = card;
+            this.Stack = this.Stack - amount;
+            Program.Pot += amount;
         }
-        public void SetSecondCard(Card card)
-        {
-            this.WholeCards[1] = card;
-        }
+        //public void SetFirstCard(Card card)
+        //{
+        //    this.WholeCards[0] = card;
+        //}
+        //public void SetSecondCard(Card card)
+        //{
+        //    this.WholeCards[1] = card;
+        //}
 
         internal static void SetWholeCards(Player[] players, Deck deck)
         {

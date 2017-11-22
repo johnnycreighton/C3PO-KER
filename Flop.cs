@@ -1,13 +1,16 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
+﻿using BluffinMuffin.HandEvaluator;
+using System;
 using System.Collections;
-
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Samus
 {
-    class PreFlop
+    class Flop
     {
+
         private static int Dealer;
         private static int BigBlind;
         private static int NoOfRaises;
@@ -18,8 +21,13 @@ namespace Samus
         private static bool AllIn;
         private static bool AllInCall;
 
-        //TODO count raises (done) act accordingly. alwasy 3 bet with a beast. 
-        internal static void Play(Player[] players, int posish, Hashtable ranking)
+        /*IStringCardsHolder[] players1 =
+                {
+                    new Player("Johnny", deck1.DealCard().ToString(), deck1.DealCard().ToString(), CommunityCards[0], CommunityCards[1], CommunityCards[2], CommunityCards[3], CommunityCards[4]),
+                    new Player("Coralie", deck1.DealCard().ToString(), deck1.DealCard().ToString(), CommunityCards[0], CommunityCards[1], CommunityCards[2], CommunityCards[3], CommunityCards[4] ),
+                };
+                */
+    internal static void Play(Player[] players, string[] communityCards, int posish)
         {
             NoOfRaises = 0;
             HasRaise = false;
@@ -32,22 +40,17 @@ namespace Samus
             posish = 1 - posish; //organise
             Dealer = 1 - posish;
             BigBlind = posish;
-            players[Dealer].Button = true;
-
-            players[Dealer].PayPot(Program.SmallBlind); //pay blinds
-            players[BigBlind].PayPot(Program.BigBlind);
 
             while (HasRaise || !Call)
             {
-                //Dealer acts first in a heads up game.
                 if (AllInCall) return;
-                Action(players[Dealer], ranking);
-                
+                Action(players[Dealer], communityCards);
+
                 if (CheckForFolds(players) || RaiseCalled == true) return;
                 //BB action
                 if (AllInCall) return;
 
-                Action(players[BigBlind], ranking);
+                Action(players[BigBlind], communityCards);
                 if (CheckForFolds(players)) return;
             }
         }
@@ -69,62 +72,20 @@ namespace Samus
             return false;
         }
 
-        public static void Action(Player actionplayer, Hashtable ranking)
+        public static void Action(Player actionplayer, string[] communityCards)
         {
-            if (actionplayer.Rank == 0) // check for hand ranking - preflop only
+            IStringCardsHolder[] players =
+                {
+                    new Program.Player("Johnny", actionplayer.FirstCard.ToString(),actionplayer.SecondCard.ToString(), communityCards[0], communityCards[1], communityCards[2])
+                };
+            foreach (var p in HandEvaluators.Evaluate(players).SelectMany(x => x))
             {
-                var hand = actionplayer.FirstCard.ToString().TrimEnd('c', 'd', 's', 'h') + actionplayer.SecondCard.ToString().TrimEnd('c', 'd', 's', 'h');
-                int element1 = 1;
-                int element2 = 1;
-
-                var suit = "";
-
-                if (actionplayer.FirstCard.ToString().Contains("10")) //tens have special attributes becaus
-                {
-                    //cardOne = hand.Substring(0, 2);
-                    hand = hand.Replace("10", "T");
-                    element1 = 2;
-                }
-                if (actionplayer.SecondCard.ToString().Contains("10"))
-                {
-                    hand = hand.Replace("10", "T");
-                    element2 = 2;
-                }
-                var cardOne = hand.Substring(0, 1);
-                var cardTwo = hand.Substring(1, 1);
-                if (actionplayer.FirstCard.ToString().ElementAt(element1).Equals(actionplayer.SecondCard.ToString().ElementAt(element2)))
-                {
-                    suit = "s";
-                    hand = hand + "s";
-                }
-                else
-                {
-                    hand = hand + "o";
-                    suit = "o";
-                }
-
-                foreach (DictionaryEntry elem in ranking)
-                {
-                    if (cardOne == cardTwo) //different algo for pairs
-                    {
-                        if (elem.Value.ToString().Substring(0, 1).Contains(cardOne) && elem.Value.ToString().Substring(1, 1).Contains(cardTwo) && elem.Value.ToString().Contains(suit))
-                        {
-                            actionplayer.Rank = Int32.Parse(elem.Key.ToString());
-                        }
-                    }
-                    else
-                    {
-                        if (elem.Value.ToString().Contains(cardOne) && elem.Value.ToString().Contains(cardTwo) && elem.Value.ToString().Contains(suit))
-                        {
-                            actionplayer.Rank = Int32.Parse(elem.Key.ToString());
-                        }
-                    }
-
-                }
+                var winner = HandEvaluators.Evaluate(p.CardsHolder.PlayerCards, p.CardsHolder.CommunityCards);
             }
+
             //Thread.Sleep(30); //TODO machine is too fast         ----------------------------------- call someones all in
             Random rand = new Random();
-            if(actionplayer.Rank < 3)
+            if (actionplayer.Rank < 3)
             {
 
             }
@@ -138,7 +99,7 @@ namespace Samus
                     Program.MainAllIn = true;
                     return;
                 }
-                else 
+                else
                 {
                     actionplayer.Fold = true;
                     Program.MainFold = true;
@@ -162,14 +123,14 @@ namespace Samus
                     NoOfRaises++;
                     return;
                 }
-                else if(actionplayer.Rank < 42 && NoOfRaises < 3)
+                else if (actionplayer.Rank < 42 && NoOfRaises < 3)
                 {
                     actionplayer.PayPot(Raise);
                     HasRaise = false;
                     RaiseCalled = true;
                     return;
                 }
-                
+
                 else { actionplayer.Fold = true; return; }
             }
             else if (actionplayer.Rank > 35 && Call && actionplayer.Button == false) //for a BB check
@@ -196,4 +157,5 @@ namespace Samus
             }
         }
     }
+
 }

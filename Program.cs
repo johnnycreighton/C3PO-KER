@@ -4,11 +4,27 @@ using System.Linq;
 using static System.String;
 using BluffinMuffin.HandEvaluator;
 using System.Threading;
+using System.Collections;
 
 namespace Samus
 {
     public class Program
     {
+        //public static bool Call;
+        //public static bool Raise;
+        //public static bool Option;
+        public static bool MainAllIn;
+        public static bool MainFold;
+        public static int SmallBlind = 25;
+        public static int BigBlind = 50;
+        public static int Pot;
+
+        public static int MyWinnings;
+        public static int OpponentsWinnings;
+
+
+        public static Hashtable ranking = new Hashtable();
+
         public class Player : IStringCardsHolder
         {
             public string Name { get; }
@@ -30,49 +46,73 @@ namespace Samus
             public IEnumerable<string> CommunityCards => Cards.Skip(2);
         }
         public static String[] CommunityCards = new String[5];
-        public static void SetCommunityCards(Deck deck)
+        public static void SetFlopCards(Deck deck)
         {
             var x = 0;
             do
             {
-                CommunityCards[x] = deck.DealCard().ToString();
+                CommunityCards[x] = deck.DealCard().ToString();//flop three cards
                 x++;
-            } while (x < 5);
+            } while (x < 3);
         }
-
         private int stack = 10000;
+
         private static void Main()
         {
-            Deck deck = new Deck();
-            deck.Shuffle();
+            TwoCardRanking.PopulateHashTable(ranking);
             var amountOfHands = 0;
-            var biggest = HandEvaluators.Evaluate(new[] { "Ks", "Ac" }, new[] { "8d", "3c", "7s", "10h", "2s" });
-          
-            
-          
-            Samus.Player[] players =
+            while (true)
             {
-                new Samus.Player("johnny"),
-                new Samus.Player("Coralie")
-            };
+                MainFold = false;
+                MainAllIn = false;
+                
+                // var biggest = HandEvaluators.Evaluate(new[] { "Ks", "Ac" }, new[] { "8d", "3c", "7s", "10h", "2s" });
+
+
+
+
+
+
+                Samus.Player[] players =
+                {
+                        new Samus.Player("johnny"),
+                        new Samus.Player("Coralie")
+                };
+
+
+                Pot = 0;
+                Deck deck = new Deck();
+                deck.Shuffle();
+                Samus.Player.SetWholeCards(players, deck);
+
+                
+                PreFlop.Play(players, amountOfHands++, ranking);
+                if (!MainFold && !MainAllIn) //if no all in and no folds continue onto the flop
+                {
+                    SetFlopCards(deck);
+                    Flop.Play(players,CommunityCards, amountOfHands);
+                }
+                else if (MainFold) //someone folded, start a hand again
+                {
+                   // break;
+                }
+                else //someone all in, run out the hand
+                {
+                    SetFlopCards(deck);
+                    //turn
+                    //river
+                }
+
+
+
+
+                foreach (var player in players)
+                {
+                    player.Fold = false;
+                }
+
+            }
             
-            Samus.Player.SetWholeCards(players, deck);
-            
-                      
-            PreFlop.Play(players, amountOfHands);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -112,7 +152,7 @@ namespace Samus
                 }
                 p1Cards = p1Cards.Substring(0, 2) + "," + p1Cards.Substring(2)+ ",";
 
-                SetCommunityCards(deck1);
+                SetFlopCards(deck1);
                 var communeCardsString = string.Join(",", CommunityCards);
                 // string[] player1Cards = new { deck.DealCard().ToString()};
                 IStringCardsHolder[] players1 =
@@ -157,5 +197,25 @@ namespace Samus
             }
             Console.ReadKey();
         }
+
+
+        // TODO move check for folds here so it can be used more often(less code)
+
+        //private static bool CheckForFolds(Player[] players)
+        //{
+        //    if (players[0].Fold == true) //check to see has either has folded
+        //    {
+        //        Program.OpponentsWinnings += Program.Pot / 2; // divided by two , measuring profit alone
+        //        Program.MyWinnings -= Program.Pot / 2;
+        //        return true;
+        //    }
+        //    else if (players[1].Fold == true)
+        //    {
+        //        Program.MyWinnings += Program.Pot / 2;
+        //        Program.OpponentsWinnings -= Program.Pot / 2;
+        //        return true;
+        //    }
+        //    return false;
+        //}
     }
 }
