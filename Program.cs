@@ -5,14 +5,14 @@ using static System.String;
 using BluffinMuffin.HandEvaluator;
 using System.Threading;
 using System.Collections;
+//using System.ValueTuple;
 
 namespace Samus
 {
     public class Program
     {
-        //public static bool Call;
-        //public static bool Raise;
-        //public static bool Option;
+
+
         public static bool MainAllIn;
         public static bool MainFold;
         public static int SmallBlind = 25;
@@ -55,7 +55,6 @@ namespace Samus
                 x++;
             } while (x < 3);
         }
-        private int stack = 10000;
 
         private static void Main()
         {
@@ -65,7 +64,7 @@ namespace Samus
             {
                 MainFold = false;
                 MainAllIn = false;
-                
+
                 // var biggest = HandEvaluators.Evaluate(new[] { "Ks", "Ac" }, new[] { "8d", "3c", "7s", "10h", "2s" });
 
 
@@ -85,34 +84,33 @@ namespace Samus
                 deck.Shuffle();
                 Samus.Player.SetWholeCards(players, deck);
 
-                
+
                 PreFlop.Play(players, amountOfHands++, ranking);
+                MainFold = HandStrategies.Folds.CheckForFolds(players);
+
                 if (!MainFold && !MainAllIn) //if no all in and no folds continue onto the flop
                 {
                     SetFlopCards(deck);
-                    Flop.Play(players,CommunityCards, amountOfHands);
+                    //Program.CheckForDraws(actionplayer, communityCards); //maybe just check here for readabillity
+
+                    Flop.Play(players, CommunityCards, amountOfHands);
                 }
-                else if (MainFold) //someone folded, start a hand again
-                {
-                   // break;
-                }
-                else //someone all in, run out the hand
+                else if (MainAllIn) //someone all in, run out the hand
                 {
                     SetFlopCards(deck);
                     //turn
                     //river
                 }
+               
 
 
 
-
-                foreach (var player in players)
+                foreach (var player in players) // for resetting the folding attributes
                 {
                     player.Fold = false;
                 }
 
             }
-            
 
 
 
@@ -131,6 +129,36 @@ namespace Samus
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            /*
             var count = 0;
             var johnnyWin = 0;
             var coralieWin = 0;
@@ -140,7 +168,7 @@ namespace Samus
 
                 Deck deck1 = new Deck();
                 deck1.Shuffle();
-                             
+
 
                 string p1Cards = "";
                 string p2Cards = "";
@@ -150,7 +178,7 @@ namespace Samus
                     p1Cards += deck1.DealCard().ToString();
                     p2Cards += deck1.DealCard().ToString();
                 }
-                p1Cards = p1Cards.Substring(0, 2) + "," + p1Cards.Substring(2)+ ",";
+                p1Cards = p1Cards.Substring(0, 2) + "," + p1Cards.Substring(2) + ",";
 
                 SetFlopCards(deck1);
                 var communeCardsString = string.Join(",", CommunityCards);
@@ -159,10 +187,10 @@ namespace Samus
                 {
                     new Player("Johnny", deck1.DealCard().ToString(), deck1.DealCard().ToString(), CommunityCards[0], CommunityCards[1], CommunityCards[2], CommunityCards[3], CommunityCards[4]),
                     new Player("Coralie", deck1.DealCard().ToString(), deck1.DealCard().ToString(), CommunityCards[0], CommunityCards[1], CommunityCards[2], CommunityCards[3], CommunityCards[4] ),
-                   
+
 
                 };
-                
+
                 // foreach (var p in HandEvaluators.Evaluate(players1))
                 // {
                 //    // if()
@@ -193,29 +221,10 @@ namespace Samus
                         Thread.Sleep(30);
                         break;
                     }
-                }                              
+                }
             }
-            Console.ReadKey();
+            Console.ReadKey();*/
         }
-
-
-        // TODO move check for folds here so it can be used more often(less code)
-
-        //private static bool CheckForFolds(Player[] players)
-        //{
-        //    if (players[0].Fold == true) //check to see has either has folded
-        //    {
-        //        Program.OpponentsWinnings += Program.Pot / 2; // divided by two , measuring profit alone
-        //        Program.MyWinnings -= Program.Pot / 2;
-        //        return true;
-        //    }
-        //    else if (players[1].Fold == true)
-        //    {
-        //        Program.MyWinnings += Program.Pot / 2;
-        //        Program.OpponentsWinnings -= Program.Pot / 2;
-        //        return true;
-        //    }
-        //    return false;
-        //}
     }
 }
+

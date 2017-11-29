@@ -8,8 +8,8 @@ namespace Samus
 {
     public class Card
     {
-        private string face;
-        private string suit;
+        public string face;
+        public string suit;
 
         public Card(string cardFace, string cardSuit)
         {

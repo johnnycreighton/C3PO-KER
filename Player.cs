@@ -10,12 +10,32 @@ namespace Samus
     {
         public int Stack = 10000;
         public int Rank;
-        public bool AllIn;
+       
+        public double Tolerance;
+
         public string Name;
+        public string Hand;
+
         public Card FirstCard;
         public Card SecondCard;
+
+        public bool AllIn;
         public bool Button;
         public bool Fold;
+        public bool FlushDraw;
+        public bool BackDoorFlushDraw;
+        public bool StraightDraw;
+        public bool BackDoorStraightDraw;
+        public bool OpenEndedStraightDraw;
+        public bool GutShotStraightDraw;
+
+
+
+        /*
+         * options for speed
+         * add card ranks reduces the need to check for straights/flushes 
+         * 
+         */
 
 
         public Player(String name)

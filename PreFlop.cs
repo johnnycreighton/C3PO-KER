@@ -43,34 +43,23 @@ namespace Samus
                 if (AllInCall) return;
                 Action(players[Dealer], ranking);
                 
-                if (CheckForFolds(players) || RaiseCalled == true) return;
+                if (HandStrategies.Folds.CheckForFolds(players) || RaiseCalled == true) return;
                 //BB action
                 if (AllInCall) return;
 
                 Action(players[BigBlind], ranking);
-                if (CheckForFolds(players)) return;
+                if (HandStrategies.Folds.CheckForFolds(players)) return;
             }
         }
 
-        private static bool CheckForFolds(Player[] players)
-        {
-            if (players[0].Fold == true) //check to see has either has folded
-            {
-                Program.OpponentsWinnings += Program.Pot / 2; // divided by two , measuring profit alone
-                Program.MyWinnings -= Program.Pot / 2;
-                return true;
-            }
-            else if (players[1].Fold == true)
-            {
-                Program.MyWinnings += Program.Pot / 2;
-                Program.OpponentsWinnings -= Program.Pot / 2;
-                return true;
-            }
-            return false;
-        }
+        
 
         public static void Action(Player actionplayer, Hashtable ranking)
         {
+            //if(actionplayer.FirstCard.ToString().Contains("T") || actionplayer.SecondCard.ToString().Contains("T"))
+            //{
+
+            //}
             if (actionplayer.Rank == 0) // check for hand ranking - preflop only
             {
                 var hand = actionplayer.FirstCard.ToString().TrimEnd('c', 'd', 's', 'h') + actionplayer.SecondCard.ToString().TrimEnd('c', 'd', 's', 'h');
@@ -79,17 +68,17 @@ namespace Samus
 
                 var suit = "";
 
-                if (actionplayer.FirstCard.ToString().Contains("10")) //tens have special attributes becaus
-                {
-                    //cardOne = hand.Substring(0, 2);
-                    hand = hand.Replace("10", "T");
-                    element1 = 2;
-                }
-                if (actionplayer.SecondCard.ToString().Contains("10"))
-                {
-                    hand = hand.Replace("10", "T");
-                    element2 = 2;
-                }
+               //if (actionplayer.FirstCard.ToString().Contains("10")) //tens have special attributes becaus
+               //{
+               //    //cardOne = hand.Substring(0, 2);
+               //    hand = hand.Replace("10", "T");
+               //    element1 = 2;
+               //}
+               //if (actionplayer.SecondCard.ToString().Contains("10"))
+               //{
+               //    hand = hand.Replace("10", "T");
+               //    element2 = 2;
+               //}
                 var cardOne = hand.Substring(0, 1);
                 var cardTwo = hand.Substring(1, 1);
                 if (actionplayer.FirstCard.ToString().ElementAt(element1).Equals(actionplayer.SecondCard.ToString().ElementAt(element2)))
@@ -122,7 +111,7 @@ namespace Samus
 
                 }
             }
-            //Thread.Sleep(30); //TODO machine is too fast         ----------------------------------- call someones all in
+            Thread.Sleep(30); //TODO machine is too fast         ----------------------------------- call someones all in
             Random rand = new Random();
             if(actionplayer.Rank < 3)
             {

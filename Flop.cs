@@ -21,12 +21,6 @@ namespace Samus
         private static bool AllIn;
         private static bool AllInCall;
 
-        /*IStringCardsHolder[] players1 =
-                {
-                    new Player("Johnny", deck1.DealCard().ToString(), deck1.DealCard().ToString(), CommunityCards[0], CommunityCards[1], CommunityCards[2], CommunityCards[3], CommunityCards[4]),
-                    new Player("Coralie", deck1.DealCard().ToString(), deck1.DealCard().ToString(), CommunityCards[0], CommunityCards[1], CommunityCards[2], CommunityCards[3], CommunityCards[4] ),
-                };
-                */
     internal static void Play(Player[] players, string[] communityCards, int posish)
         {
             NoOfRaises = 0;
@@ -46,45 +40,74 @@ namespace Samus
                 if (AllInCall) return;
                 Action(players[Dealer], communityCards);
 
-                if (CheckForFolds(players) || RaiseCalled == true) return;
+                if (HandStrategies.Folds.CheckForFolds(players) || RaiseCalled == true) return;
                 //BB action
                 if (AllInCall) return;
 
                 Action(players[BigBlind], communityCards);
-                if (CheckForFolds(players)) return;
+                if (HandStrategies.Folds.CheckForFolds(players)) return;
             }
         }
-
-        private static bool CheckForFolds(Player[] players)
-        {
-            if (players[0].Fold == true) //check to see has either has folded
-            {
-                Program.OpponentsWinnings += Program.Pot / 2; // divided by two , measuring profit alone
-                Program.MyWinnings -= Program.Pot / 2;
-                return true;
-            }
-            else if (players[1].Fold == true)
-            {
-                Program.MyWinnings += Program.Pot / 2;
-                Program.OpponentsWinnings -= Program.Pot / 2;
-                return true;
-            }
-            return false;
-        }
+              
 
         public static void Action(Player actionplayer, string[] communityCards)
         {
             IStringCardsHolder[] players =
                 {
-                    new Program.Player("Johnny", actionplayer.FirstCard.ToString(),actionplayer.SecondCard.ToString(), communityCards[0], communityCards[1], communityCards[2])
+                    new Program.Player(actionplayer.Name, actionplayer.FirstCard.ToString(),actionplayer.SecondCard.ToString(), communityCards[0], communityCards[1], communityCards[2])
                 };
+
+            HandEvaluationResult hand = null;
             foreach (var p in HandEvaluators.Evaluate(players).SelectMany(x => x))
             {
-                var winner = HandEvaluators.Evaluate(p.CardsHolder.PlayerCards, p.CardsHolder.CommunityCards);
+                hand = HandEvaluators.Evaluate(p.CardsHolder.PlayerCards, p.CardsHolder.CommunityCards);
             }
+            actionplayer.Hand = hand.Hand.ToString();
+
+            HandStrategies.Draws.CheckForDraws(actionplayer, communityCards);
+
+            switch (hand.Hand.ToString())
+            {
+                case "HighCard":
+                    HandStrategies.HighCard.Action(actionplayer, true);
+                    break;
+                case "OnePair":
+                case "TwoPairs":
+                case "ThreeOfAKind":
+                case "Straight":
+                case "Flush":
+                   
+                
+                default: //any else flopped is whopper go nuts //careful off the flop coming trips and a pair in your hand, spells disaster
+
+                    break;
+
+                    /*
+                     * HighCard = 0;
+                     * OnePair = 1;
+                     *  = 2;
+                     *  = 3;
+                     *  = 4;
+                     *  = 5;
+                     * FullHouse = 6;
+                     * FourOfAKind = 7;
+                     * StraightFlush = 8;
+                    
+                     */
+            }
+
 
             //Thread.Sleep(30); //TODO machine is too fast         ----------------------------------- call someones all in
             Random rand = new Random();
+
+
+
+
+
+
+
+
+
             if (actionplayer.Rank < 3)
             {
 
