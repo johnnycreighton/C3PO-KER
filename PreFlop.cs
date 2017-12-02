@@ -21,6 +21,7 @@ namespace Samus
         //TODO count raises (done) act accordingly. alwasy 3 bet with a beast. 
         internal static void Play(Player[] players, int posish, Hashtable ranking)
         {
+
             NoOfRaises = 0;
             HasRaise = false;
             Call = false;
@@ -62,33 +63,33 @@ namespace Samus
             //}
             if (actionplayer.Rank == 0) // check for hand ranking - preflop only
             {
-                var hand = actionplayer.FirstCard.ToString().TrimEnd('c', 'd', 's', 'h') + actionplayer.SecondCard.ToString().TrimEnd('c', 'd', 's', 'h');
+                //var hand = actionplayer.FirstCard.ToString().TrimEnd('c', 'd', 's', 'h') + actionplayer.SecondCard.ToString().TrimEnd('c', 'd', 's', 'h');
                 int element1 = 1;
                 int element2 = 1;
 
                 var suit = "";
+                var cardOne = actionplayer.FirstCard.ToString().TrimEnd('c', 'd', 's', 'h');
+                var cardTwo = actionplayer.SecondCard.ToString().TrimEnd('c', 'd', 's', 'h');
 
-               //if (actionplayer.FirstCard.ToString().Contains("10")) //tens have special attributes becaus
-               //{
-               //    //cardOne = hand.Substring(0, 2);
-               //    hand = hand.Replace("10", "T");
-               //    element1 = 2;
-               //}
-               //if (actionplayer.SecondCard.ToString().Contains("10"))
-               //{
-               //    hand = hand.Replace("10", "T");
-               //    element2 = 2;
-               //}
-                var cardOne = hand.Substring(0, 1);
-                var cardTwo = hand.Substring(1, 1);
+                if (actionplayer.FirstCard.ToString().Contains("10")) //tens have special attributes becaus
+               {
+                    cardOne = "T";
+                    element1 = 2;
+               }
+               if (actionplayer.SecondCard.ToString().Contains("10"))
+               {
+                    cardTwo = "T";
+                   element2 = 2;
+               }
+                
                 if (actionplayer.FirstCard.ToString().ElementAt(element1).Equals(actionplayer.SecondCard.ToString().ElementAt(element2)))
                 {
                     suit = "s";
-                    hand = hand + "s";
+                    //hand = hand + "s";
                 }
                 else
                 {
-                    hand = hand + "o";
+                   // hand = hand + "o";
                     suit = "o";
                 }
 
@@ -99,6 +100,7 @@ namespace Samus
                         if (elem.Value.ToString().Substring(0, 1).Contains(cardOne) && elem.Value.ToString().Substring(1, 1).Contains(cardTwo) && elem.Value.ToString().Contains(suit))
                         {
                             actionplayer.Rank = Int32.Parse(elem.Key.ToString());
+                            break;
                         }
                     }
                     else
@@ -106,6 +108,7 @@ namespace Samus
                         if (elem.Value.ToString().Contains(cardOne) && elem.Value.ToString().Contains(cardTwo) && elem.Value.ToString().Contains(suit))
                         {
                             actionplayer.Rank = Int32.Parse(elem.Key.ToString());
+                            break;
                         }
                     }
 
@@ -114,7 +117,7 @@ namespace Samus
             Thread.Sleep(30); //TODO machine is too fast         ----------------------------------- call someones all in
             Random rand = new Random();
             if(actionplayer.Rank < 3)
-            {
+            {//do something here for fuck sake
 
             }
             if (AllIn)

@@ -169,7 +169,7 @@ namespace Samus.HandStrategies
                     for (int j = i + 1; j < i + 5; ++j) //bundles of five from i && i + 1 because i know the first one is true 
                     {
 
-                        if (straightChecker[j] == true && straightChecker[j + 1] == true && straightChecker[j + 1] == true && straightChecker[j + 1] == true)
+                        if (j < 11 &&  straightChecker[j] == true && straightChecker[j + 1] == true && straightChecker[j + 2] == true && straightChecker[j + 3] == true)
                         {
                             actionplayer.OpenEndedStraightDraw = true;
                             break;
