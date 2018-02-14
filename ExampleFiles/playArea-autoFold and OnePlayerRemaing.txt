@@ -1,0 +1,28 @@
+Current Hand:0
+bot1 sits at positon 1 [BUTTON]
+bot2 sits at positon 2
+bot3 sits at positon 3
+bot4 sits at positon 4
+All players post an ante of 1
+bot2 posts the small blind: 4
+bot3 posts the big blind: 8
+bot4 called: 8, to: 8
+bot1 called: 8, to: 8
+bot2 called: 4, to: 8
+bot3 raised: 4, to: 12
+bot4 called: 4, to: 12
+bot1 called: 4, to: 12
+bot2 called: 4, to: 12
+*** FLOP *** [39 36 18]
+bot2 posts the small blind: 4
+bot3 posts the big blind: 8
+bot4 called: 8, to: 20
+bot1 folded 
+bot2 folded 
+bot3 made no decision- Auto fold 
+bot4 won 72, all other players folded 
+Board cards: [39, 36, 18, 26, 43]
+bot1 had cards [13, 24]
+bot2 had cards [6, 7]
+bot3 had cards [46, 17]
+bot4 had cards [29, 45]

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace Samus.HandStrategies
 {
@@ -12,7 +8,7 @@ namespace Samus.HandStrategies
         {
             int i = 0;
             int[] myCards = new int[2];
-            bool[] straightChecker = new bool[15]; //use a boolean array
+            bool[] straightChecker = new bool[15]; //using a boolean array
 
             string mySuits = "";
             string boardSuits = "";
@@ -159,7 +155,7 @@ namespace Samus.HandStrategies
                 actionplayer.FlushDraw = true;
             }
 
-
+            //TODO : what if it finds a back door first when there is actually an open ender after it. It does check, (double check this)
             short count = 0; //straight draw checker.
             for (i = 1; i <= straightChecker.Length - 5; ++i) // checking in fives, so minus 5 for speed
             {
@@ -191,7 +187,5 @@ namespace Samus.HandStrategies
                 }
             }
         }
-
-
     }
 }

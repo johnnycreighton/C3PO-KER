@@ -1,21 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Samus.HandStrategies
+﻿namespace Samus.HandStrategies
 {
     class PotOddsTolerance
     {
         internal static void CalculateTolerance(Player actionplayer, bool flop)
         {
-        
             if(actionplayer.OpenEndedStraightDraw && actionplayer.FlushDraw) // ~35% equity if behind
             {//15 outs
                 
                 if(flop)
                     actionplayer.Tolerance = Program.Pot / 2.1;
+                else
+                    actionplayer.Tolerance = Program.Pot / 1.2;
+                return;
+            }
+
+            if (actionplayer.OpenEndedStraightDraw && actionplayer.BackDoorFlushDraw) // ~35% equity if behind
+            {//8 outs + backdoor flush
+
+                if (flop)
+                    actionplayer.Tolerance = Program.Pot / 1.9;
                 else
                     actionplayer.Tolerance = Program.Pot / 1.2;
                 return;
@@ -42,7 +45,7 @@ namespace Samus.HandStrategies
             else if (actionplayer.OpenEndedStraightDraw) //~25% equit when marginally behind
             {//8 outs
                 if (flop)
-                    actionplayer.Tolerance = Program.Pot * 4.75;
+                    actionplayer.Tolerance = Program.Pot / 4.75;
                 else
                     actionplayer.Tolerance = Program.Pot / 2.17;
                 return;
@@ -52,6 +55,14 @@ namespace Samus.HandStrategies
             {//4 outs
                 if (flop)
                     actionplayer.Tolerance = Program.Pot / 9;
+                else
+                    actionplayer.Tolerance = Program.Pot / 15;
+                return;
+            }
+            else if (actionplayer.BackDoorFlushDraw) // hits 21.11% equity if behind
+            {//4% chance
+                if (flop)
+                    actionplayer.Tolerance = Program.Pot / 10;
                 else
                     actionplayer.Tolerance = Program.Pot / 15;
                 return;

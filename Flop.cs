@@ -21,7 +21,7 @@ namespace Samus
         private static bool AllIn;
         private static bool AllInCall;
 
-    internal static void Play(Player[] players, string[] communityCards, int posish)
+        internal static void Play(Player[] players, string[] communityCards, int posish)
         {
             NoOfRaises = 0;
             HasRaise = false;
@@ -38,19 +38,19 @@ namespace Samus
             while (HasRaise || !Call)
             {
                 if (AllInCall) return;
-                Action(players[Dealer], communityCards);
+                SetUp(players[Dealer], communityCards);
 
                 if (HandStrategies.Folds.CheckForFolds(players) || RaiseCalled == true) return;
                 //BB action
                 if (AllInCall) return;
 
-                Action(players[BigBlind], communityCards);
+                SetUp(players[BigBlind], communityCards);
                 if (HandStrategies.Folds.CheckForFolds(players)) return;
             }
         }
-              
 
-        public static void Action(Player actionplayer, string[] communityCards)
+
+        public static void SetUp(Player actionplayer, string[] communityCards)
         {
             IStringCardsHolder[] players =
                 {
@@ -66,119 +66,61 @@ namespace Samus
 
             HandStrategies.Draws.CheckForDraws(actionplayer, communityCards);
 
-            switch (hand.Hand.ToString())
+            switch (hand.Hand.ToString()) //work out a way to decide on flop turn and river more fluidly
             {
                 case "HighCard":
                     HandStrategies.HighCard.Action(actionplayer, true);
                     break;
                 case "OnePair":
+                    HandStrategies.OnePair.Action(actionplayer, true);
+                    break;
                 case "TwoPairs":
                 case "ThreeOfAKind":
                 case "Straight":
                 case "Flush":
-                   
-                
-                default: //any else flopped is whopper go nuts //careful off the flop coming trips and a pair in your hand, spells disaster
+
+
+                default: //anything else flopped is whopper go nuts //careful of the flop coming trips and a pair in your hand, spells disaster - build a check class
 
                     break;
 
-                    /*
-                     * HighCard = 0;
-                     * OnePair = 1;
-                     *  = 2;
-                     *  = 3;
-                     *  = 4;
-                     *  = 5;
-                     * FullHouse = 6;
-                     * FourOfAKind = 7;
-                     * StraightFlush = 8;
-                    
-                     */
             }
 
+
+            while (HasRaise || !Call) //if there has been a raise and no call as of yet continue betting.
+            {
+
+              //  Play(actionplayer);
+
+               
+            }
+            
+
+            
 
             //Thread.Sleep(30); //TODO machine is too fast         ----------------------------------- call someones all in
-            Random rand = new Random();
 
-
-
-
-
-
-
-
-
-            if (actionplayer.Rank < 3)
-            {
-
-            }
-            if (AllIn)
-            {
-                if (NoOfRaises <= 2 && actionplayer.Rank < 30 || NoOfRaises > 2 && actionplayer.Rank <= 5)
-                {
-                    actionplayer.PayPot(Raise);
-                    Call = true;
-                    AllInCall = true;
-                    Program.MainAllIn = true;
-                    return;
-                }
-                else
-                {
-                    actionplayer.Fold = true;
-                    Program.MainFold = true;
-                }
-            }
-            if (HasRaise) //strategy is based on amount of raises and ranking of hand.       
-            {
-                if (actionplayer.Rank <= 2 && NoOfRaises > 3)
-                {
-                    Raise = actionplayer.Stack;
-                    actionplayer.PayPot(Raise);
-                    AllIn = true;
-                    Program.MainAllIn = true;
-                    return;
-                }
-                else if (actionplayer.Rank < 6 && NoOfRaises <= 3)
-                {
-                    Raise *= rand.Next(2, 3); //pot bed here in stead of raise bet, think
-                    actionplayer.PayPot(Raise);
-                    HasRaise = true;
-                    NoOfRaises++;
-                    return;
-                }
-                else if (actionplayer.Rank < 42 && NoOfRaises < 3)
-                {
-                    actionplayer.PayPot(Raise);
-                    HasRaise = false;
-                    RaiseCalled = true;
-                    return;
-                }
-
-                else { actionplayer.Fold = true; return; }
-            }
-            else if (actionplayer.Rank > 35 && Call && actionplayer.Button == false) //for a BB check
-            {
-                //Call = false;
-                return;
-            }
-            if (actionplayer.Rank <= 34)
-            {
-                Raise = Program.BigBlind * rand.Next(2, 5);
-                actionplayer.PayPot(Raise);
-                HasRaise = true;
-                NoOfRaises++;
-            }
-            else if (actionplayer.Rank < 72)
-            {
-                actionplayer.PayPot(Program.SmallBlind);
-                Call = true;
-            }
-            else
-            {
-                actionplayer.Fold = true;
-                Program.MainFold = true;
-            }
         }
-    }
 
+      /*  private static void Play(Player actionplayer)
+        {
+            if (!HasRaise && actionplayer.check) return; // check and no raise = continue on with game
+            else actionplayer.Fold = true; // check and raise = fold
+
+
+            //Dealer acts first in a heads up game.
+            if (AllInCall) return;
+            Action(players[Dealer], ranking);
+
+            //BB action
+            if (HandStrategies.Folds.CheckForFolds(players) || RaiseCalled == true) return;
+            if (AllInCall) return;
+
+            Action(players[BigBlind], ranking);
+            if (HandStrategies.Folds.CheckForFolds(players)) return;
+
+
+
+        }*/
+    }
 }

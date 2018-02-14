@@ -54,15 +54,20 @@
     <Compile Include="Card.cs" />
     <Compile Include="deck.cs" />
     <Compile Include="Flop.cs" />
+    <Compile Include="Flopper.cs" />
+    <Compile Include="GetWinner.cs" />
     <Compile Include="HandStrategies\Draws.cs" />
     <Compile Include="HandStrategies\Folds.cs" />
     <Compile Include="HandStrategies\HighCard.cs" />
+    <Compile Include="HandStrategies\OnePair.cs" />
     <Compile Include="HandStrategies\PotOddsTolerance.cs" />
+    <Compile Include="MoreLinq\MoreEnumerable.MaxBy.cs" />
     <Compile Include="Pay.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PreFlop.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resets\ReuseableMethods.cs" />
     <Compile Include="TwoCardRanking.cs" />
   </ItemGroup>
   <ItemGroup>

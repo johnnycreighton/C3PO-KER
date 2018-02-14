@@ -5,7 +5,7 @@ namespace Samus
     class TwoCardRanking
     {
         //Class to evaluate starting hands, based on profit, ref. FTP
-        internal static void PopulateHashTable(Hashtable ranking)
+        internal static void PopulateHashTable(Hashtable ranking) //redo for limit holdem
         {
             ranking.Add("1", "AAo");
             ranking.Add("2", "KKo");

@@ -19,8 +19,14 @@ namespace Samus
         public Card FirstCard;
         public Card SecondCard;
 
+        public string FirstCardTest;
+        public string SecondCardTest;
+
+
+
         public bool AllIn;
         public bool Button;
+        public bool check;
         public bool Fold;
         public bool FlushDraw;
         public bool BackDoorFlushDraw;
@@ -56,6 +62,11 @@ namespace Samus
         //    this.WholeCards[1] = card;
         //}
 
+        /// <summary>
+        /// Deals alternative whole cards to all players.
+        /// </summary>
+        /// <param name="players"></param>
+        /// <param name="deck"></param>
         internal static void SetWholeCards(Player[] players, Deck deck)
         {
             players[0].FirstCard = deck.DealCard();
