@@ -53,6 +53,8 @@
   <ItemGroup>
     <Compile Include="Card.cs" />
     <Compile Include="deck.cs" />
+    <Compile Include="FileManipulation\CardTransform.cs" />
+    <Compile Include="FileManipulation\Extractions.cs" />
     <Compile Include="Flop.cs" />
     <Compile Include="Flopper.cs" />
     <Compile Include="GetWinner.cs" />

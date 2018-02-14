@@ -148,71 +148,7 @@ namespace Samus
             BotFileChanged = true;
         }
 
-        private static bool FileIsReady(string sFileName)
-        {
-            FileStream stream = null;
-            FileInfo file = new FileInfo(sFileName);
-            try
-            {
-                stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None);
-            }
-            catch (IOException)
-            {
-                //the file is unavailable because it is:
-                //still being written to
-                //or being processed by another thread
-                //or does not exist (has already been processed)
-                return false;
-            }
-            finally
-            {
-                if (stream != null)
-                    stream.Close();
-            }
-
-            //file is not locked
-            return true;
-
-
-
-
-
-
-            //FileStream fs = new FileStream(sFileName, FileMode.Open, FileAccess.Write);
-            //if (fs.CanWrite)
-            //{
-            //    fs.Close();
-            //    return true;
-            //}
-
-
-
-
-
-
-
-
-            // If the file can be opened for exclusive access it means that the file
-            // is no longer locked by another process.
-            //try
-            //{
-            //    using (FileStream inputStream = File.Open(sFileName, FileMode.Open, FileAccess.Read, FileShare.None))
-            //    {
-            //        if (inputStream.Length > 0)
-            //        {
-            //            return true;
-            //        }
-            //        else
-            //        {
-            //            return false;
-            //        }
-            //    }
-            //}
-            //catch (Exception)
-            //{
-            //    return false;
-            //}
-        }
+      
         
 
 
@@ -293,12 +229,13 @@ namespace Samus
             if(IsHandFinished(Path))
             {
                 File.AppendAllText(DebugBotPath, "Hand Finished sort this line out- what to do." + System.Environment.NewLine);
+                return;
             }
 
 
 
 
-            Flopper.Start(Path, rank, Position, Hand,);
+            Flopper.Start(Path, rank, Position, Hand);
 
 
 
@@ -354,7 +291,7 @@ namespace Samus
             while (true)//check if file is ready to read.
             {
                 File.AppendAllText(DebugBotPath, "Checking if file is ready." + System.Environment.NewLine);
-                if (FileIsReady(Path))
+                if (FileManipulation.Extractions.FileIsReady(Path))
                 {
                   lines = System.IO.File.ReadAllLines(Path);
                   break;
@@ -456,7 +393,7 @@ namespace Samus
             File.AppendAllText(DebugBotPath, "Big blind first action." + System.Environment.NewLine);
             while (true)//check if file is ready to read.
             {
-                if (FileIsReady(BotPath))
+                if (FileManipulation.Extractions.FileIsReady(BotPath))
                 {
                     File.AppendAllText(DebugBotPath, "File ready." + System.Environment.NewLine);
                     
@@ -481,6 +418,7 @@ namespace Samus
                     {
                         File.AppendAllText(DebugBotPath, "Changing bot file to 'f' because rank is bad and raise found." + System.Environment.NewLine);
                         File.WriteAllText(BotPath, "f");
+                        System.Environment.Exit(0);
                         HandFinished = true;
                         break;
                     }
@@ -504,7 +442,7 @@ namespace Samus
             }
             while (true)
             {
-                if (FileIsReady(path))
+                if (FileManipulation.Extractions.FileIsReady(Path))
                 {
                     lines = System.IO.File.ReadAllLines(path);
                     break;
@@ -534,7 +472,7 @@ namespace Samus
 
             while (true)
             {
-                if (FileIsReady(BotPath))
+                if (FileManipulation.Extractions.FileIsReady(BotPath))
                 {
                     if (rank < 35)
                     {
@@ -556,6 +494,7 @@ namespace Samus
                     {
                         File.AppendAllText(DebugBotPath, "Changed bot file to 'f'." + System.Environment.NewLine);
                         File.WriteAllText(BotPath, "f");
+                        System.Environment.Exit(0);
                         HandFinished = true;
                         break;
                     }
@@ -579,7 +518,7 @@ namespace Samus
             //check for finished.
             while (true)
             {
-                if (FileIsReady(path))
+                if (FileManipulation.Extractions.FileIsReady(Path))
                 {
                     lines = System.IO.File.ReadAllLines(path);
                     break;
@@ -608,7 +547,7 @@ namespace Samus
 
             while (true)//check if file is ready to read.
             {
-                if (FileIsReady(BotPath))
+                if (FileManipulation.Extractions.FileIsReady(BotPath))
                 {
                     text = System.IO.File.ReadAllText(BotPath);
                     break;
@@ -993,15 +932,7 @@ namespace Samus
             HandFetched = true;
             return hand;
 
-            /*
-             * suit:
-             * 0 = spades
-             * 1 = clubs
-             * 2 = hearts
-             * 3 = diamonds
-             * 
-             * rank 0 = deuce, 12 = ace
-             */
+            
 
            
         }

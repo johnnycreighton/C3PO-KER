@@ -8,7 +8,8 @@ namespace Samus
 {
     public class Flopper
     {
-
+        private static string BotPathFile = Program.BotPath;
+        private static string[] FileText;
 
         public static void Start(string path, int rank, int position, string hand)
         {
@@ -22,21 +23,12 @@ namespace Samus
 
             //go turning*
 
-            if (text.Length > 4)
-            {
-                Cards[0] = Convert.ToInt32(text.Substring(0, 2)) / 4;
-                Cards[1] = Convert.ToInt32(text.Substring(3)) / 4;
-
-                Suits[0] = Convert.ToInt32(text.Substring(0, 2)) % 4;
-                Suits[1] = Convert.ToInt32(text.Substring(3)) % 4;
-            }
+            FileText = FileManipulation.Extractions.GetFileInfo(path);
+            string[] cardNumbers = FileManipulation.Extractions.GetFlopCardNumbers(FileText); //trim start and finish
+            string flopCards = FileManipulation.CardTransform.Flop(cardNumbers);
 
 
-
-
+            return;
         }
-
-
-
     }
 }
