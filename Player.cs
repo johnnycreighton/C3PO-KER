@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Samus
 {
@@ -10,7 +6,7 @@ namespace Samus
     {
         public int Stack = 10000;
         public int Rank;
-       
+
         public double Tolerance;
 
         public string Name;
@@ -18,11 +14,6 @@ namespace Samus
 
         public Card FirstCard;
         public Card SecondCard;
-
-        public string FirstCardTest;
-        public string SecondCardTest;
-
-
 
         public bool AllIn;
         public bool Button;
@@ -42,25 +33,179 @@ namespace Samus
          * add card ranks reduces the need to check for straights/flushes 
          * 
          */
+        public void SetPreFlopCards(object[] cards, object[] suits)
+        {
+            string cardOne = null;
+            string cardTwo = null;
+            string cardSuitOne = null;
+            string cardSuitTwo = null;
 
+            switch (cards[0].ToString())
+            {
+                case "0":
+
+                    cardOne = "2";
+                    break;
+
+                case "1":
+                    cardOne  = "3";
+                    break;
+
+                case "2":
+                    cardOne = "4";
+                    break;
+
+                case "3":
+                    cardOne = "5";
+                    break;
+
+                case "4":
+                    cardOne = "6";
+                    break;
+
+                case "5":
+                    cardOne = "7";
+                    break;
+
+                case "6":
+                    cardOne = "8";
+                    break;
+
+                case "7":
+                    cardOne = "9";
+                    break;
+
+                case "8":
+                    cardOne = "10"; //TODO: check if its T or 10
+                    break;
+
+                case "9":
+                    cardOne = "J";
+                    break;
+
+                case "10":
+                    cardOne = "Q";
+                    break;
+
+                case "11":
+                    cardOne = "K";
+                    break;
+
+                case "12":
+                    cardOne = "A";
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException("Card value does not exist. Re-check input.");
+
+            }
+
+            switch (cards[1].ToString())
+            {
+                case "0":
+                    cardTwo = "2";
+                    break;
+
+
+                case "1":
+                    cardTwo = "3";
+                    break;
+
+                case "2":
+                    cardTwo = "4";
+                    break;
+
+                case "3":
+                    cardTwo = "5";
+                    break;
+
+                case "4":
+                    cardTwo = "6";
+                    break;
+
+                case "5":
+                    cardTwo = "7";
+                    break;
+
+                case "6":
+                    cardTwo = "8";
+                    break;
+
+                case "7":
+                    cardTwo = "9";
+                    break;
+
+                case "8":
+                    cardTwo = "10"; //TODO: check if its T or 10
+                    break;
+
+                case "9":
+                    cardTwo = "J";
+                    break;
+
+                case "10":
+                    cardTwo = "Q";
+                    break;
+
+                case "11":
+                    cardTwo = "K";
+                    break;
+
+                case "12":
+                    cardTwo = "A";
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException("Card value does not exist. Re-check input.");
+
+            }
+
+            switch (suits[0].ToString())
+            {
+                case "0":
+                    cardSuitOne = "s";
+                    break;
+                case "1":
+                    cardSuitOne = "c";
+                    break;
+                case "2":
+                    cardSuitOne = "h";
+                    break;
+                case "3":
+                    cardSuitOne = "d";
+                    break;
+            }
+
+            switch (suits[1].ToString())
+            {
+                case "0":
+                    cardSuitTwo = "s";
+                    break;
+                case "1":
+                    cardSuitTwo = "c";
+                    break;
+                case "2":
+                    cardSuitTwo = "h";
+                    break;
+                case "3":
+                    cardSuitTwo = "d";
+                    break;
+            }
+
+            FirstCard = new Card(cardOne, cardSuitOne);
+            SecondCard = new Card(cardTwo, cardSuitTwo);
+        }
 
         public Player(String name)
         {
-            this.Name = name; 
+            Name = name; 
         }
         public void PayPot(int amount)
         {
             this.Stack = this.Stack - amount;
             Program.Pot += amount;
         }
-        //public void SetFirstCard(Card card)
-        //{
-        //    this.WholeCards[0] = card;
-        //}
-        //public void SetSecondCard(Card card)
-        //{
-        //    this.WholeCards[1] = card;
-        //}
+        
 
         /// <summary>
         /// Deals alternative whole cards to all players.

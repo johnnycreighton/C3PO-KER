@@ -35,9 +35,25 @@ namespace Samus.FileManipulation
             //file is not locked
             return true;
         }
+
+        internal static int GetTurnCardNumber(string[] lines)
+        {
+            File.AppendAllText(Program.DebugBotPath, "Getting TURN card number..." + System.Environment.NewLine);
+
+            foreach (string line in lines) //try catch this
+            {
+                if (line.Contains("TURN"))
+                {
+                    string endOfString = line.Substring(line.Length - 3); // line will = ***TURN*** [X][Y][Z] [turn card], i only want the turn card
+                    return Convert.ToInt32(Regex.Match(endOfString, @"\d+").Value); //grabs the first number in the line
+                }
+            }
+            throw new Exception("TURN card not here. test this method.");
+        }
+
         public static string[] GetFlopCardNumbers(string[] lines)
         {
-            File.AppendAllText(Program.DebugBotPath, "Getting Flop card numbers..." + System.Environment.NewLine);
+            File.AppendAllText(Program.DebugBotPath, "Getting FLOP card numbers..." + System.Environment.NewLine);
 
             foreach (string line in lines) //try catch this
             {
@@ -46,7 +62,7 @@ namespace Samus.FileManipulation
                     return Regex.Split(line, @"\D+"); //returns string array of numbers, which are the  flop cards.
                 }    
             }
-            throw new Exception();
+            throw new Exception("FLOP not here. test this method.");
         }
 
         public static string[] GetFileInfo(string path)

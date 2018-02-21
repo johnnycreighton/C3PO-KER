@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Samus.FileManipulation
 {
@@ -11,103 +7,123 @@ namespace Samus.FileManipulation
         private static int[] CardResult = new int[3];
         private static int[] SuitResult = new int[3];
 
-        internal static string Flop(string[] cardNumbers)
+        private static string[] CardResultStr = new string[3];
+        private static string[] SuitResultStr = new string[3];
+
+        internal static void Flop(string[] cardNumbers, ref string[] communityCards)
         {
             int i = 0;
             foreach(var number in cardNumbers)
             {
                 if (number.Length < 1)
                     continue;
-                GetCardNumber(number, i);
+                GetCardNumber(number, i); //gets card number and suits
                 GetCardSuit(number, i);
                 ++i;
             }
-            return ExposeCards(CardResult, SuitResult);
+
+            ExposeCards(-1); //translates numbers into cards + suits
+
+            for (i = 0; i < 3; ++i)
+            {
+                communityCards[i] = CardResultStr[i] + SuitResultStr[i]; //populates community cards using the ref keyword.
+            }
         }
 
-        private static string ExposeCards(int[] cardResult, int[] suitResult)
+        internal static void Turn(int turnNumber, ref string[] communityCards)
         {
-            string result = null;
-            foreach (var element in cardResult)
+            GetCardNumber(turnNumber.ToString(), 0); //gets card number and suits
+            GetCardSuit(turnNumber.ToString(), 0);
+
+            ExposeCards(-1); //translates numbers into cards + suits
+            
+            communityCards[3] = CardResultStr[0] + SuitResultStr[0]; //populates community cards using the ref keyword. // value in CardResultString will get overwritten here but we dont care. 
+        }
+
+        internal static void ExposeCards(int i)
+        {
+            foreach (var element in CardResult)
             {
+                ++i;
                 switch (element.ToString())
                 {
                     case "0":
-                        result += "2";
+                        CardResultStr[i] = "2";
                         continue;
 
                     case "1":
-                        result += "3";
+                        CardResultStr[i]= "3";
                         continue;
 
                     case "2":
-                        result += "4";
+                        CardResultStr[i]= "4";
                         continue;
 
                     case "3":
-                        result += "5";
+                        CardResultStr[i]= "5";
                         continue;
 
                     case "4":
-                        result += "6";
+                        CardResultStr[i]= "6";
                         continue;
 
                     case "5":
-                        result += "7";
+                        CardResultStr[i]= "7";
                         continue;
 
                     case "6":
-                        result += "8";
+                        CardResultStr[i]= "8";
                         continue;
 
                     case "7":
-                        result += "9";
+                        CardResultStr[i]= "9";
                         continue;
 
                     case "8":
-                        result += "T"; //TODO: check if its T or 10
+                        CardResultStr[i]= "10"; 
                         continue;
 
                     case "9":
-                        result += "J";
+                        CardResultStr[i]= "J";
                         continue;
 
                     case "10":
-                        result += "Q";
+                        CardResultStr[i]= "Q";
                         continue;
 
                     case "11":
-                        result += "K";
+                        CardResultStr[i]= "K";
                         continue;
 
                     case "12":
-                        result += "A";
+                        CardResultStr[i]= "A";
                         continue;
 
                     default:
-                        throw new ArgumentOutOfRangeException("Card value does not exist. Re-check input.");
+                        continue;
+                        //throw new ArgumentOutOfRangeException("Card value does not exist. Re-check input.");
                 }
             }
-
-            foreach (var element in suitResult)
+            i = -1;
+            foreach (var element in SuitResult)
             {
+                ++i;
                 switch (element.ToString())
                 {
                     case "0":
-                        result += "s";
+                        SuitResultStr[i] = "S";
                         continue;
                     case "1":
-                        result += "c";
+                        SuitResultStr[i] = "C";
                         continue;
                     case "2":
-                        result += "h";
+                        SuitResultStr[i] = "H";
                         continue;
                     case "3":
-                        result += "d";
+                        SuitResultStr[i] = "D";
                         continue;
                 }
             }
-            return result;
             /*
              * suit:
              * 0 = spades
@@ -121,11 +137,11 @@ namespace Samus.FileManipulation
 
         internal static void GetCardNumber(string number, int position)
         {
-                CardResult[position] = Convert.ToInt32(number) / 4;
+                CardResult[position] = Convert.ToInt32(number) / 4; //eg 6 / 4 = 1, 1 = "card of face 3", 
         }
         internal static void GetCardSuit(string number, int position)
         {
-             SuitResult[position] = Convert.ToInt32(number) % 4;
+             SuitResult[position] = Convert.ToInt32(number) % 4; //eg 10 mod 4 = 2, 2 = "hearts"
         }
     }
 }

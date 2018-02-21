@@ -9,12 +9,17 @@ using System.IO;
 using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
+using Samus.Streets;
+
+
 //using System.ValueTuple;
 
 namespace Samus
 {
     public class Program
     {
+        public static Samus.Player Samus = new Samus.Player("Samus");
+
         public static string DebugBotPath = @"D:\4th Year CSSE\Samus\DebugBot.txt";
         public static string BotPath = @"D:\4th Year CSSE\Samus\Cashino\PokerTesterGCC-master\simulationFiles\bots\bot1.txt";
          
@@ -40,12 +45,8 @@ namespace Samus
 
         public static string Hand;
         public static int i = -1;
-        public static bool BotFileChanged;
-
+     
         private static bool FirstAction = true;
-
-        public static bool PlayAreaEvenFileChanged;
-        public static bool PlayAreaOddFileChanged;
 
         public static int Counter = 0;
 
@@ -59,11 +60,7 @@ namespace Samus
         public static int MyWinnings;
         public static int OpponentsWinnings;
 
-        public static FileSystemWatcher BotWatcher = new FileSystemWatcher();
-        public static FileSystemWatcher PlayAreaEvenWatcher = new FileSystemWatcher();
-        public static FileSystemWatcher PlayAreaOddWatcher = new FileSystemWatcher();
-
-
+        public static String[] CommunityCards = new String[5];
 
         public static Hashtable ranking = new Hashtable();
 
@@ -87,116 +84,48 @@ namespace Samus
 
             public IEnumerable<string> CommunityCards => Cards.Skip(2);
         }
-        public static String[] CommunityCards = new String[5];
-        public static void SetCommunityCards(Deck deck, int numberOfCards)
-        {
-            short x = 0;
-            do
-            {
-                var index = Array.FindIndex(CommunityCards, i => i == null || i.Length == 0);
-                
-                CommunityCards[index] = deck.DealCard().ToString();//flop three cards
-                x++;
-            } while (x < numberOfCards); // minus one for -> starts at zero
-        }
+       
+       // public static void SetCommunityCards(Deck deck, int numberOfCards)
+       // {
+       //     short x = 0;
+       //     do
+       //     {
+       //         var index = Array.FindIndex(CommunityCards, i => i == null || i.Length == 0);
+       //         
+       //         CommunityCards[index] = deck.DealCard().ToString();//flop three cards
+       //         x++;
+       //     } while (x < numberOfCards); // minus one for -> starts at zero
+       // }
 
-        [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
-        private static void StartBotWatcher(string path)
-        {
-            BotWatcher.Path = path;
-            BotWatcher.NotifyFilter = NotifyFilters.LastWrite;
-            BotWatcher.Filter = "bot1.txt";
-            
-            BotWatcher.Changed += new FileSystemEventHandler(BotFileChange);
-            // Begin watching.
-            BotWatcher.EnableRaisingEvents = true;
-        }
-
-        private static void StartPlayAreaEvenWatcher(string path)
-        {
-            PlayAreaEvenWatcher.Path = path;
-            PlayAreaEvenWatcher.NotifyFilter = NotifyFilters.LastWrite;
-            PlayAreaEvenWatcher.Filter = "*Even.txt";
-
-            PlayAreaEvenWatcher.Changed += new FileSystemEventHandler(PlayAreaEvenFileChange);
-
-            // Begin watching.
-            PlayAreaEvenWatcher.EnableRaisingEvents = true;
-        }
-        private static void StartPlayAreaOddWatcher(string path)
-        {
-            PlayAreaOddWatcher.Path = path;
-            PlayAreaOddWatcher.NotifyFilter = NotifyFilters.LastWrite;
-            PlayAreaOddWatcher.Filter = "*Odd.txt";
-
-            PlayAreaOddWatcher.Changed += new FileSystemEventHandler(PlayAreaOddFileChange);
-
-            // Begin watching.
-            PlayAreaOddWatcher.EnableRaisingEvents = true;
-        }
-        private static void PlayAreaOddFileChange(object sender, FileSystemEventArgs e)
-        {
-            PlayAreaOddFileChanged = true;
-        }
-        private static void PlayAreaEvenFileChange(object sender, FileSystemEventArgs e)
-        {
-            PlayAreaEvenFileChanged = true;
-        }
-
-        private static void BotFileChange(object source, FileSystemEventArgs e)
-        {
-            BotFileChanged = true;
-        }
-
-      
-        
-
-
-        private static void StopWatcher(string path)
-        {
-            if (path.Contains("Odd"))
-            {
-                PlayAreaOddWatcher.EnableRaisingEvents = false;
-                PlayAreaOddWatcher.Changed -= new FileSystemEventHandler(PlayAreaOddFileChange);
-            }
-            else if(path.Contains("Even"))
-            {
-                PlayAreaEvenWatcher.EnableRaisingEvents = false;
-                PlayAreaEvenWatcher.Changed -= new FileSystemEventHandler(PlayAreaEvenFileChange);
-            }
-            else
-            {
-                BotWatcher.EnableRaisingEvents = false;
-                BotWatcher.Changed -= new FileSystemEventHandler(BotFileChange);
-            }
-            BotFileChanged = false;
-        }
+       
 
 
         private static void Main()
         {
-            StopWatcher(PlayAreaPathOdd);
-            
+           //File.WriteAllText(PlayAreaPathOdd, "fuck you dawid"); //Emptying playArea for new game
+
+            FileManipulation.Listeners.StopWatcher(PlayAreaPathOdd);
+
             File.WriteAllText(DebugBotPath, ""); //Emptying Debugger for new game
             File.AppendAllText(DebugBotPath, "Main Method Invoked." + System.Environment.NewLine);
-            Samus.Player johnny = new Samus.Player("johnny");
-            TwoCardRanking.PopulateHashTable(ranking); //generates ranking of all pre-flop hands based on average money won per hand
             
-            StartBotWatcher(BotDirPath); 
+            TwoCardRanking.PopulateHashTable(ranking); //generates ranking of all pre-flop hands based on average money won per hand
+
+            FileManipulation.Listeners.StartBotWatcher(BotDirPath); 
             File.AppendAllText(DebugBotPath, "Bot watcher started." + System.Environment.NewLine);
             File.AppendAllText(DebugBotPath, "Starting both play area bot watchers." + System.Environment.NewLine);
-            StartPlayAreaEvenWatcher(PlayAreaDirPath); //starting play area watchers to aquire correct position.
-            StartPlayAreaOddWatcher(PlayAreaDirPath);
+            
             File.AppendAllText(DebugBotPath, "Started." + System.Environment.NewLine);
 
             while (true)//first action pre-flop
             {
-                if (BotFileChanged)
+                if (FileManipulation.Listeners.BotFileChanged)
                 {
                     File.AppendAllText(DebugBotPath, "\nHand Number: " + ++Counter + "\nBotFileChanged = true." + System.Environment.NewLine);
                     File.AppendAllText(DebugBotPath, "HandFetched = true. " + System.Environment.NewLine);
                     BotEventFired();
-
+                    FileManipulation.Listeners.StartPlayAreaEvenWatcher(PlayAreaDirPath); //starting play area watchers to aquire correct position.
+                    FileManipulation.Listeners.StartPlayAreaOddWatcher(PlayAreaDirPath);
                     switch (GetPosition())
                     {
 
@@ -211,64 +140,170 @@ namespace Samus
                         default:
                             throw new NotImplementedException(); // act accordingly.
                     }
+                    
+                    FileManipulation.Listeners.StopWatcher(GetPath());
+                    
                     //if i call on the button and he raises from the big blind
 
-                    BotFileChanged = false;
-                    StartBotWatcher(BotDirPath);
+                    FileManipulation.Listeners.BotFileChanged = false;
+                    //FileManipulation.Listeners.StartBotWatcher(BotDirPath);
                     //Position = 0;// reset for multiple hands at once
                     File.AppendAllText(DebugBotPath, "BotFileChanged = false.\nFirst actions have been performed." + System.Environment.NewLine);
                     break;
                 }
             }
+            //FileManipulation.Listeners.StartPlayAreaEvenWatcher(PlayAreaDirPath); //starting play area watchers to aquire correct position.
+            //FileManipulation.Listeners.StartPlayAreaOddWatcher(PlayAreaDirPath);
+
 
             // if(RaiseFound(GetPath())) //TODO when two bots compete, check for a raise to your call.
             // {
             //     
             // }
-            
-            if(IsHandFinished(Path))
+
+            if (IsHandFinished(Path))
             {
                 File.AppendAllText(DebugBotPath, "Hand Finished sort this line out- what to do." + System.Environment.NewLine);
                 return;
             }
 
-
-
-
-            Flopper.Start(Path, rank, Position, Hand);
-
-
-
-            while(true)
+            while (true)
             {
-                if (PlayAreaEvenFileChanged && !PlayAreaOddFileChanged)
+                if (FileManipulation.Listeners.PlayAreaEvenFileChanged && !FileManipulation.Listeners.PlayAreaOddFileChanged)
+                {
+                    //File.AppendAllText(DebugBotPath, "PlayAreaEvenFileChanged = true." + System.Environment.NewLine);
+                    File.AppendAllText(DebugBotPath, string.Format("\nHeaded for the flop with cards {0} {1}", Samus.FirstCard, Samus.SecondCard) + System.Environment.NewLine);
+                    Flopper.Start(Path, rank, Position, DebugBotPath);
+                    // PlayAreaEventFired(PlayAreaPathEven);
+
+                    // File.AppendAllText(DebugBotPath, "PlayAreaEvenFileChanged = false." + System.Environment.NewLine);
+                    FileManipulation.Listeners.PlayAreaEvenFileChanged = false;
+                    FileManipulation.Listeners.StartPlayAreaEvenWatcher(PlayAreaDirPath);
+
+                    break;
+                }
+                else if (FileManipulation.Listeners.PlayAreaOddFileChanged && !FileManipulation.Listeners.PlayAreaEvenFileChanged)
+                {
+                    // File.AppendAllText(DebugBotPath, "PlayAreaOddFileChanged = true." + System.Environment.NewLine);
+                    File.AppendAllText(DebugBotPath, string.Format("\nHeaded for the flop with cards {0} {1}", Samus.FirstCard, Samus.SecondCard) + System.Environment.NewLine);
+                    Flopper.Start(Path, rank, Position, DebugBotPath);
+                    //PlayAreaOddEventFired(PlayAreaPathOdd);
+
+                    // File.AppendAllText(DebugBotPath, "PlayAreaOddFileChanged = false." + System.Environment.NewLine);
+                    FileManipulation.Listeners.PlayAreaOddFileChanged = false;
+                    FileManipulation.Listeners.StartPlayAreaOddWatcher(PlayAreaDirPath);
+                    break;
+                }
+                //******************************************************************************************************************
+
+
+
+
+
+
+
+            }
+            while (true)
+            {
+                //******************************************************************************************************************
+                if (FileManipulation.Listeners.PlayAreaEvenFileChanged && !FileManipulation.Listeners.PlayAreaOddFileChanged)
+                {
+                    //File.AppendAllText(DebugBotPath, "PlayAreaEvenFileChanged = true." + System.Environment.NewLine);
+                    File.AppendAllText(DebugBotPath, string.Format("\nHeaded for the turn with best hand {0}", Samus.Hand) + Environment.NewLine);
+                    Turner.Start(Path, rank, Position, DebugBotPath);
+                    // PlayAreaEventFired(PlayAreaPathEven);
+
+                   // File.AppendAllText(DebugBotPath, "PlayAreaEvenFileChanged = false." + System.Environment.NewLine);
+                    FileManipulation.Listeners.PlayAreaEvenFileChanged = false;
+                    FileManipulation.Listeners.StartPlayAreaEvenWatcher(PlayAreaDirPath);
+
+                    break;
+                }
+                else if (FileManipulation.Listeners.PlayAreaOddFileChanged && !FileManipulation.Listeners.PlayAreaEvenFileChanged)
+                {
+                   // File.AppendAllText(DebugBotPath, "PlayAreaOddFileChanged = true." + System.Environment.NewLine);
+                    File.AppendAllText(DebugBotPath, string.Format("\nHeaded for the turn with best hand {0}", Samus.Hand) + Environment.NewLine);
+                    Turner.Start(Path, rank, Position, DebugBotPath);
+                    //PlayAreaOddEventFired(PlayAreaPathOdd);
+
+                   // File.AppendAllText(DebugBotPath, "PlayAreaOddFileChanged = false." + System.Environment.NewLine);
+                    FileManipulation.Listeners.PlayAreaOddFileChanged = false;
+                    FileManipulation.Listeners.StartPlayAreaOddWatcher(PlayAreaDirPath);
+                    break;
+                }
+                //******************************************************************************************************************
+            }
+
+            if (IsHandFinished(Path))
+            {
+                File.AppendAllText(DebugBotPath, "Hand Finished sort this line out- what to do." + System.Environment.NewLine);
+                return;
+            }
+            while (true)
+            {
+                //******************************************************************************************************************
+                if (FileManipulation.Listeners.PlayAreaEvenFileChanged && !FileManipulation.Listeners.PlayAreaOddFileChanged)
+                {
+                    //File.AppendAllText(DebugBotPath, "PlayAreaEvenFileChanged = true." + System.Environment.NewLine);
+                    File.AppendAllText(DebugBotPath, string.Format("\nHeaded for the river with best hand {0}", Samus.Hand) + Environment.NewLine);
+                    River.Start(Path, rank, Position, DebugBotPath);
+                    // PlayAreaEventFired(PlayAreaPathEven);
+
+                    //File.AppendAllText(DebugBotPath, "PlayAreaEvenFileChanged = false." + System.Environment.NewLine);
+                    FileManipulation.Listeners.PlayAreaEvenFileChanged = false;
+                    FileManipulation.Listeners.StartPlayAreaEvenWatcher(PlayAreaDirPath);
+
+                    break;
+                }
+                else if (FileManipulation.Listeners.PlayAreaOddFileChanged && !FileManipulation.Listeners.PlayAreaEvenFileChanged)
+                {
+                    //File.AppendAllText(DebugBotPath, "PlayAreaOddFileChanged = true." + System.Environment.NewLine);
+                    File.AppendAllText(DebugBotPath, string.Format("\nHeaded for the river with best hand {0}", Samus.Hand) + Environment.NewLine);
+                    River.Start(Path, rank, Position, DebugBotPath);
+                    //PlayAreaOddEventFired(PlayAreaPathOdd);
+
+                    //File.AppendAllText(DebugBotPath, "PlayAreaOddFileChanged = false." + System.Environment.NewLine);
+                    FileManipulation.Listeners.PlayAreaOddFileChanged = false;
+                    FileManipulation.Listeners.StartPlayAreaOddWatcher(PlayAreaDirPath);
+                    break;
+                }
+                //******************************************************************************************************************
+            }
+
+
+            
+
+
+            while (true)
+            {
+                if (FileManipulation.Listeners.PlayAreaEvenFileChanged && !FileManipulation.Listeners.PlayAreaOddFileChanged)
                 {
                     File.AppendAllText(DebugBotPath, "PlayAreaEvenFileChanged = true." + System.Environment.NewLine);
 
                     PlayAreaEventFired(PlayAreaPathEven);
 
                     File.AppendAllText(DebugBotPath, "PlayAreaEvenFileChanged = false." + System.Environment.NewLine);
-                    PlayAreaEvenFileChanged = false;
+                    FileManipulation.Listeners.PlayAreaEvenFileChanged = false;
 
 
-                    StartPlayAreaEvenWatcher(PlayAreaDirPath);///////////////////////
+                    FileManipulation.Listeners.StartPlayAreaEvenWatcher(PlayAreaDirPath);///////////////////////
                 }
-                else if (PlayAreaOddFileChanged && !PlayAreaEvenFileChanged)
+                else if (FileManipulation.Listeners.PlayAreaOddFileChanged && !FileManipulation.Listeners.PlayAreaEvenFileChanged)
                 {
                     File.AppendAllText(DebugBotPath, "PlayAreaOddFileChanged = true." + System.Environment.NewLine);
 
                     PlayAreaOddEventFired(PlayAreaPathOdd);
 
                     File.AppendAllText(DebugBotPath, "PlayAreaOddFileChanged = false." + System.Environment.NewLine);
-                    PlayAreaOddFileChanged = false;
-                    StartPlayAreaOddWatcher(PlayAreaDirPath);
+                    FileManipulation.Listeners.PlayAreaOddFileChanged = false;
+                    FileManipulation.Listeners.StartPlayAreaOddWatcher(PlayAreaDirPath);
                 }
                 if (HandFinished)
                 {
                     File.AppendAllText(DebugBotPath, "Hand finished, resetting variables. \n\n\n" + System.Environment.NewLine);
-                    StartBotWatcher(BotDirPath);
-                    StartPlayAreaEvenWatcher(PlayAreaDirPath);
-                    StartPlayAreaOddWatcher(PlayAreaDirPath);
+                    FileManipulation.Listeners.StartBotWatcher(BotDirPath);
+                    FileManipulation.Listeners.StartPlayAreaEvenWatcher(PlayAreaDirPath);
+                    FileManipulation.Listeners.StartPlayAreaOddWatcher(PlayAreaDirPath);
                     HandFinished = false;
                     HandFetched = false;
                     FirstAction = true;
@@ -307,7 +342,7 @@ namespace Samus
                     //System.Text.RegularExpressions.Regex
                     //  \d+ is the first integer occurrence in Regex.  
                     Position = Convert.ToInt32(Regex.Match(newLine, @"\d+").Value);
-                    File.AppendAllText(DebugBotPath, "Position Found: " + Position + System.Environment.NewLine);
+                    File.AppendAllText(DebugBotPath, "Position Found: " + Position +"\t"+ line+System.Environment.NewLine);
                     break;
                 }
             }
@@ -320,12 +355,12 @@ namespace Samus
         {
             while (true)
             {
-                if (PlayAreaOddFileChanged)
+                if (FileManipulation.Listeners.PlayAreaOddFileChanged)
                 {
                     playAreaLocation = "Odd";
                     return PlayAreaPathOdd;
                 }
-                else if (PlayAreaEvenFileChanged)
+                else if (FileManipulation.Listeners.PlayAreaEvenFileChanged)
                 {
                     playAreaLocation = "Even";
                     return PlayAreaPathEven;
@@ -339,8 +374,8 @@ namespace Samus
             File.AppendAllText(DebugBotPath, "Play Area Odd Event fired." + System.Environment.NewLine);
 
             File.AppendAllText(DebugBotPath, "Stopping play area bot odd watcher." + System.Environment.NewLine);
-            
-            StopWatcher(PlayAreaPathOdd);
+
+            FileManipulation.Listeners.StopWatcher(PlayAreaPathOdd);
 
             int resultString = GetPosition();
 
@@ -366,7 +401,7 @@ namespace Samus
             File.AppendAllText(DebugBotPath, "Play Area Even Event fired." + System.Environment.NewLine);
 
             File.AppendAllText(DebugBotPath, "Stopping play area bot even watcher." + System.Environment.NewLine);
-            StopWatcher(path);
+            FileManipulation.Listeners.StopWatcher(path);
 
             int resultString = GetPosition();
 
@@ -386,53 +421,7 @@ namespace Samus
             //}
         }
 
-        private static void BigBlindFirstAction()
-        {
-            string path = GetPath();
-            
-            File.AppendAllText(DebugBotPath, "Big blind first action." + System.Environment.NewLine);
-            while (true)//check if file is ready to read.
-            {
-                if (FileManipulation.Extractions.FileIsReady(BotPath))
-                {
-                    File.AppendAllText(DebugBotPath, "File ready." + System.Environment.NewLine);
-                    
-                    if (rank < 35) //careful of number of raises -> check 
-                    {
-                        if(RaisesFound < 4)
-                        {
-                            File.AppendAllText(DebugBotPath, "Changing bot file to 'r'." + System.Environment.NewLine);
-                            File.WriteAllText(BotPath, "r");
-                            ++RaisesFound;
-                            break;
-                        }
-                        else
-                        {
-                            File.AppendAllText(DebugBotPath, "Changing bot file to 'c'." + System.Environment.NewLine);
-                            File.WriteAllText(BotPath, "c");
-                            break;
-                        }
-                        
-                    }
-                    else if(rank > 71 && RaiseFound(path))
-                    {
-                        File.AppendAllText(DebugBotPath, "Changing bot file to 'f' because rank is bad and raise found." + System.Environment.NewLine);
-                        File.WriteAllText(BotPath, "f");
-                        System.Environment.Exit(0);
-                        HandFinished = true;
-                        break;
-                    }
-                    else
-                    {
-                        File.AppendAllText(DebugBotPath, "Changing bot file to 'c'." + System.Environment.NewLine);
-                        File.WriteAllText(BotPath, "c");//working
-                        break;
-                    }
-                }
-            }
-           // File.AppendAllText(DebugBotPath, "\n" + File.ReadAllLines(BotPath) + "\n" + System.Environment.NewLine);
-
-        }
+        
 
         private static bool RaiseFound(string path)
         {
@@ -457,11 +446,58 @@ namespace Samus
                     raise = true;
                     ++RaisesFound;
                     File.AppendAllText(DebugBotPath, "Raise found.\nStopping play area Even watcher." + System.Environment.NewLine);
-                    StopWatcher(path); // should be both.
+                    FileManipulation.Listeners.StopWatcher(path); // should be both.
                 }
                 
             }
             return raise;
+        }
+
+        private static void BigBlindFirstAction()
+        {
+            string path = GetPath();
+
+            File.AppendAllText(DebugBotPath, "Big blind first action." + System.Environment.NewLine);
+            //*RaiseFound
+            while (true)//check if file is ready to read.
+            {
+                if (FileManipulation.Extractions.FileIsReady(BotPath))
+                {
+                    if (rank < 35) //careful of number of raises -> check 
+                    {
+                        if (RaisesFound < 4)
+                        {
+                            File.AppendAllText(DebugBotPath, "Changing bot file to 'r'." + System.Environment.NewLine);
+                            File.WriteAllText(BotPath, "r");
+                            ++RaisesFound;
+                            break;
+                        }
+                        else
+                        {
+                            File.AppendAllText(DebugBotPath, "Changing bot file to 'c'." + System.Environment.NewLine);
+                            File.WriteAllText(BotPath, "c");
+                            break;
+                        }
+
+                    }
+                    else if (rank > 120 && RaiseFound(path))
+                    {
+                        File.AppendAllText(DebugBotPath, "Changing bot file to 'f' because rank is bad and raise found." + System.Environment.NewLine);
+                        File.WriteAllText(BotPath, "f");
+                        System.Environment.Exit(0);
+                        HandFinished = true;
+                        break;
+                    }
+                    else
+                    {
+                        File.AppendAllText(DebugBotPath, "Changing bot file to 'c'." + System.Environment.NewLine);
+                        File.WriteAllText(BotPath, "c");//working
+                        break;
+                    }
+                }
+            }
+            // File.AppendAllText(DebugBotPath, "\n" + File.ReadAllLines(BotPath) + "\n" + System.Environment.NewLine);
+
         }
 
         private static void ButtonFirstAction()
@@ -474,17 +510,15 @@ namespace Samus
             {
                 if (FileManipulation.Extractions.FileIsReady(BotPath))
                 {
-                    if (rank < 35)
+                    if (rank < 54)
                     {
-                        File.WriteAllText(BotPath, "r");
-
-                        File.AppendAllText(DebugBotPath, "\n" + File.ReadAllLines(BotPath) +"\n"+ System.Environment.NewLine);
                         File.AppendAllText(DebugBotPath, "Changed bot file to 'r'." + System.Environment.NewLine);
+                        File.WriteAllText(BotPath, "r");
                         ++RaisesFound;
 
                         break;
                     }
-                    else if (rank < 72)
+                    else if (rank < 93)
                     {
                         File.AppendAllText(DebugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);
                         File.WriteAllText(BotPath, "c");
@@ -505,12 +539,12 @@ namespace Samus
 
         private static bool IsHandFinished(string path)
         {
-            File.AppendAllText(DebugBotPath, "Checking if hand has finished...." + path.Substring(67) + "\n");
+            File.AppendAllText(DebugBotPath, "Checking if hand has finished...." + path.Substring(69) + "\n");
             if (handNumber == 1)
             {
                 ++handNumber;
                 HandFinished = false;
-                File.AppendAllText(DebugBotPath, "Hand NOT finished...." + path.Substring(67) + "\n");
+                File.AppendAllText(DebugBotPath, "Hand NOT finished...." + path.Substring(69) + "\n");
                 return false;
             }
             
@@ -542,7 +576,7 @@ namespace Samus
         private static void BotEventFired() //clean
         {
             File.AppendAllText(DebugBotPath, "Bot Event has fired so - Bot watcher stopped. " + System.Environment.NewLine);
-            StopWatcher(BotPath);
+            FileManipulation.Listeners.StopWatcher(BotPath);
             string text = "";
 
             while (true)//check if file is ready to read.
@@ -555,7 +589,7 @@ namespace Samus
             }
             Hand = GetWholeCards(text);
 
-            File.AppendAllText(DebugBotPath, "Bot File ready. Cards = \t" + text + "\nHole cards fetched and converted: \t" + Hand + System.Environment.NewLine);
+            File.AppendAllText(DebugBotPath, "Bot File ready.\nCards = \t" + text + "\nHole cards converted: \t" + Hand + System.Environment.NewLine);
             foreach (DictionaryEntry elem in ranking) //Gets Rank
             {
                 if (Hand[0] == Hand[1])//different algo for pairs.
@@ -584,7 +618,7 @@ namespace Samus
                 throw new Exception("No rank found, sort out");
         }
 
-        
+        /*
         private static void PopulatePlayer(Samus.Player johnny)
         {
             i = -1;
@@ -818,6 +852,7 @@ namespace Samus
             i = -1;
         }
 
+        */
 
         private static string GetWholeCards(string text)
         {
@@ -854,12 +889,12 @@ namespace Samus
                 Suits[0] = Convert.ToInt32(text.Substring(0, 2)) % 4;
                 Suits[1] = Convert.ToInt32(text.Substring(3)) % 4;
             }
-            
-            
+
+            Samus.SetPreFlopCards(Cards, Suits);
 
             string hand = "";
             
-            foreach (var element in Cards)
+            foreach (var element in Cards) //may not need this
             {
                
                 switch (element.ToString())
@@ -937,118 +972,25 @@ namespace Samus
            
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         /*
-        var count = 0;
-        var johnnyWin = 0;
-        var coralieWin = 0;
-
-        while (count < 1000000)
-        {
-
-            Deck deck1 = new Deck();
-            deck1.Shuffle();
-
-
-            string p1Cards = "";
-            string p2Cards = "";
-
-            for (int i = 0; i < 2; ++i)
-            {
-                p1Cards += deck1.DealCard().ToString();
-                p2Cards += deck1.DealCard().ToString();
-            }
-            p1Cards = p1Cards.Substring(0, 2) + "," + p1Cards.Substring(2) + ",";
-
-            SetFlopCards(deck1);
-            var communeCardsString = string.Join(",", CommunityCards);
-            // string[] player1Cards = new { deck.DealCard().ToString()};
+        
             IStringCardsHolder[] players1 =
             {
                 new Program.Player("Johnny", deck1.DealCard().ToString(), deck1.DealCard().ToString(), CommunityCards[0], CommunityCards[1], CommunityCards[2], CommunityCards[3], CommunityCards[4]),
                 new Player("Coralie", deck1.DealCard().ToString(), deck1.DealCard().ToString(), CommunityCards[0], CommunityCards[1], CommunityCards[2], CommunityCards[3], CommunityCards[4] ),
-
-
             };
 
             // foreach (var p in HandEvaluators.Evaluate(players1))
             // {
-            //    // if()
+            //   
             //     //Console.WriteLine("{0}: {1} -> {2}" + "    " + count, p.Rank == int.MaxValue ? "  " : p.Rank.ToString(), ((Player)p.CardsHolder).Name, p.Evaluation);
             // }
 
             foreach (var p in HandEvaluators.Evaluate(players1).SelectMany(x => x))
             {
-                if (p.Rank == 1)
-                {
-                    string best = p.Evaluation.ToString();
-                    if (best.Contains("Royal") || best.Contains("Straight Flush"))
-                    {
-                        Console.WriteLine("ROYAL FLUSH  at the " + count + " try.");
-                        Console.ReadKey();
-                    }
-                    if (((Player)p.CardsHolder).Name.Contains("C"))
-                    {
-                        ++coralieWin;
-                    }
-                    if (((Player)p.CardsHolder).Name.Contains("J"))
-                    {
-                        ++johnnyWin;
-                    }
-                    var winner = HandEvaluators.Evaluate(p.CardsHolder.PlayerCards, p.CardsHolder.CommunityCards);
-                    Console.WriteLine(((Player)p.CardsHolder).Name + " is the winner with: " + p.Evaluation + "\t " + count);
-                    ++count;
-                    Thread.Sleep(30);
+               
                     break;
                 }
-            }
-        }
-        Console.ReadKey();*/
+            }*/
     }
- //   }
 }

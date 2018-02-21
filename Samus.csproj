@@ -55,8 +55,10 @@
     <Compile Include="deck.cs" />
     <Compile Include="FileManipulation\CardTransform.cs" />
     <Compile Include="FileManipulation\Extractions.cs" />
+    <Compile Include="FileManipulation\Listeners.cs" />
     <Compile Include="Flop.cs" />
-    <Compile Include="Flopper.cs" />
+    <Compile Include="Streets\River.cs" />
+    <Compile Include="Streets\Flopper.cs" />
     <Compile Include="GetWinner.cs" />
     <Compile Include="HandStrategies\Draws.cs" />
     <Compile Include="HandStrategies\Folds.cs" />
@@ -70,11 +72,13 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resets\ReuseableMethods.cs" />
+    <Compile Include="Streets\Turner.cs" />
     <Compile Include="TwoCardRanking.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
