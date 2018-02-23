@@ -28,6 +28,8 @@ namespace Samus.Streets
             //check or bet
             //go turning*
 
+            System.Threading.Thread.Sleep(200);
+
             FileText = FileManipulation.Extractions.GetFileInfo(path);
             int turnCardNumber = FileManipulation.Extractions.GetTurnCardNumber(FileText); //trim start and finish
             FileManipulation.CardTransform.Turn(turnCardNumber, ref Program.CommunityCards);  //community cards being set inside.

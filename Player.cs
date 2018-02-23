@@ -25,6 +25,7 @@ namespace Samus
         public bool BackDoorStraightDraw;
         public bool OpenEndedStraightDraw;
         public bool GutShotStraightDraw;
+        internal int position;
 
 
 

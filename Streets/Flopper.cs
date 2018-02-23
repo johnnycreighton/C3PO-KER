@@ -24,7 +24,7 @@ namespace Samus
             //check draws
             //check or bet
             //go turning*
-
+            
             FileText = FileManipulation.Extractions.GetFileInfo(path);
             string[] cardNumbers = FileManipulation.Extractions.GetFlopCardNumbers(FileText); //trim start and finish
             FileManipulation.CardTransform.Flop(cardNumbers, ref Program.CommunityCards); //format = KJQ123 -> now K1J2Q3 -> community cards being set inside.
