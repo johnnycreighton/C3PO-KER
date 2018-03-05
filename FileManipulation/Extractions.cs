@@ -10,6 +10,7 @@ namespace Samus.FileManipulation
 {
     public class Extractions
     {
+        
         public static bool FileIsReady(string sFileName)
         {
             FileStream stream = null;
@@ -62,7 +63,10 @@ namespace Samus.FileManipulation
                     return Regex.Split(line, @"\D+"); //returns string array of numbers, which are the  flop cards.
                 }    
             }
-            throw new Exception("FLOP not here. test this method.");
+            File.AppendAllText(Program.DebugBotPath, "Flop wasnt found, EXITING PROGRAM." + System.Environment.NewLine);
+            System.Environment.Exit(0);
+            return null;
+            //throw new Exception("FLOP not here. test this method.");
         }
 
         public static string[] GetFileInfo(string path)
