@@ -10,11 +10,11 @@ namespace Samus.FileManipulation
 {
     public class Extractions
     {
-        
-        public static bool FileIsReady(string sFileName)
+
+        public static bool IsFileReady(String sFilename)
         {
             FileStream stream = null;
-            FileInfo file = new FileInfo(sFileName);
+            FileInfo file = new FileInfo(sFilename);
             try
             {
                 stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None);
@@ -67,18 +67,6 @@ namespace Samus.FileManipulation
             System.Environment.Exit(0);
             return null;
             //throw new Exception("FLOP not here. test this method.");
-        }
-
-        public static string[] GetFileInfo(string path)
-        {
-            File.AppendAllText(Program.DebugBotPath, "Getting file info..." + System.Environment.NewLine);
-            while (true)//check if file is ready to read.
-            {
-                if (FileIsReady(path))
-                {
-                    return File.ReadAllLines(path);
-                }
-            }
         }
     }
 }

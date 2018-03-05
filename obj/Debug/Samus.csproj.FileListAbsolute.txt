@@ -9,4 +9,3 @@ D:\4th Year CSSE\Samus\Samus\bin\Debug\System.ValueTuple.xml
 D:\4th Year CSSE\Samus\Samus\obj\Debug\Samus.csproj.CoreCompileInputs.cache
 D:\4th Year CSSE\Samus\Samus\obj\Debug\Samus.exe
 D:\4th Year CSSE\Samus\Samus\obj\Debug\Samus.pdb
-D:\4th Year CSSE\Samus\Samus\obj\Debug\Samus.csprojResolveAssemblyReference.cache

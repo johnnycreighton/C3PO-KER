@@ -2,19 +2,23 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Samus
 {
     public class Flopper
     {
-        private static string BotPathFile = Program.BotPath;
-        private static string[] FileText;
-        
-        
+        private static string CasinoToBot = Program.CasinoToBot;
+        private static string BotToCasino = Program.BotToCasino;
+        private static string DebugBotPath = Program.DebugBotPath;
+
 
         private static bool isHandFinished;
+        private static int TurnCard;
 
-        public static void Start(string path, int rank, int position, string debugBotPath) // path = play area path 
+        public static int RaisesFound { get; private set; }
+
+        public static void Start(int[] cardNumbers, int rank, int position, string debugBotPath) // path = play area path 
         {
             File.AppendAllText(debugBotPath, "\nEntered flop." + System.Environment.NewLine);
             //position 2 goes first
@@ -24,18 +28,12 @@ namespace Samus
             //check draws
             //check or bet
             //go turning*
-            while (true)
-            {
-                FileText = FileManipulation.Extractions.GetFileInfo(path);
-                if (FileText.Contains("flop"))
-                {
-                    break;
-                }
-            }
-            string[] cardNumbers = FileManipulation.Extractions.GetFlopCardNumbers(FileText); //trim start and finish
-            FileManipulation.CardTransform.Flop(cardNumbers, ref Program.CommunityCards); //format = KJQ123 -> now K1J2Q3 -> community cards being set inside.
 
-            File.AppendAllText(debugBotPath, string.Format("Read Flop cards: {0} {1} {2}", Program.CommunityCards[0], Program.CommunityCards[1], Program.CommunityCards[2]) +System.Environment.NewLine);
+            string[] cards = cardNumbers.Select(x => x.ToString()).ToArray();
+
+            FileManipulation.CardTransform.Flop(cards, ref Program.CommunityCards); //format = KJQ123 -> now K1J2Q3 -> community cards being set inside.
+
+            File.AppendAllText(debugBotPath, string.Format("Read Flop cards: {0} {1} {2}", Program.CommunityCards[0], Program.CommunityCards[1], Program.CommunityCards[2]) + System.Environment.NewLine);
             IStringCardsHolder[] players =
                 {
                     new Program.Player("Samus", Program.Samus.FirstCard.ToString(), Program.Samus.SecondCard.ToString(), Program.CommunityCards[0], Program.CommunityCards[1], Program.CommunityCards[2])
@@ -50,35 +48,81 @@ namespace Samus
             File.AppendAllText(debugBotPath, string.Format("Best five card hand post flop: {0}", bestFiveCarder + System.Environment.NewLine));
             HandStrategies.Draws.CheckForDraws(Program.Samus, Program.CommunityCards);
             File.AppendAllText(debugBotPath, "Checked for Draws!" + System.Environment.NewLine);
+
+
             while (true)
             {
-                if (FileManipulation.Extractions.FileIsReady(BotPathFile))
+                if (FileManipulation.Listeners.BotFileChanged)
                 {
-                    if (rank < 54)
+                    FileManipulation.Listeners.BotFileChanged = false;
+                    
+                    if (rank < 54) //TODO sort his out to have some real strategy
                     {
-                        File.WriteAllText(BotPathFile, "r");
+                        File.WriteAllText(BotToCasino, "r");
                         File.AppendAllText(debugBotPath, "Changed bot file to 'r'." + System.Environment.NewLine);
-                        //++RaisesFound;
-
+                        ++RaisesFound;
                         break;
                     }
                     else if (rank < 93)
                     {
                         File.AppendAllText(debugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);
-                        File.WriteAllText(BotPathFile, "c");
+                        File.WriteAllText(BotToCasino, "c");
                         break;
                     }
-                    
+                    else
                     {
                         File.AppendAllText(debugBotPath, "Changed bot file to 'c'.  this is for testing purposes only. this is actually a fold. " + System.Environment.NewLine);
-                        File.WriteAllText(BotPathFile, "c");//change to fold after testing
-                        //System.Environment.Exit(0);
-                        isHandFinished = true;
+                        File.WriteAllText(BotToCasino, "c");//change to fold after testing
+                        isHandFinished = true;                                //System.Environment.Exit(0);
                         break;
                     }
-                }   //TODO
+                }
             }
-            
+            while(true)
+            {
+                if (FileManipulation.Listeners.BotFileChanged)
+                {
+                    FileManipulation.Listeners.BotFileChanged = false;
+                    if (TurnFound())
+                    {
+                        File.AppendAllText(DebugBotPath, "Turn Found" + System.Environment.NewLine);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private static bool TurnFound()
+        {
+            string text = null;
+            while (true)
+            {
+                if (FileManipulation.Extractions.IsFileReady(CasinoToBot))
+                {
+                    text = System.IO.File.ReadAllText(CasinoToBot);
+                    break;
+                }
+            }
+
+            int index = 0;
+            if (text.Contains("T"))
+            {
+                
+                foreach (var digit in text)
+                {
+                    ++index;
+                    if (digit == 'T')
+                    {
+                        
+                        TurnCard = Convert.ToInt32(Regex.Match(text.Substring(index), @"\d+").Value);
+                        FileManipulation.CardTransform.WriteCommunityCards(TurnCard, 3);
+                        break;
+                    }
+                }
+                return true;
+            }
+            else
+                return false;
         }
     }
 }
