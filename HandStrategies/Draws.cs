@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Samus.HandStrategies
 {
@@ -125,8 +126,8 @@ namespace Samus.HandStrategies
                 }
             }
 
-            var occ = (1, '.');
-            var tempOcc = (1, '.');
+            ValueTuple<int , char> occ = new ValueTuple<int, char>(1, '.');
+            ValueTuple<int, char> tempOcc = new ValueTuple<int, char>(1, '.');
             i = 0;
             foreach (char c in mySuits) //do two because i only want my cards checked against the board
             {

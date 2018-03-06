@@ -59,14 +59,12 @@ namespace Samus
             }
             while (true)
             {
-                if (FileManipulation.Listeners.BotFileChanged)
-                {
+                
                     if (FileManipulation.Listeners.SummaryFileChanged)
                     {
-                        File.AppendAllText(debugBotPath, "River Found" + System.Environment.NewLine);
+                        File.AppendAllText(debugBotPath, "Hand finished ! ! !" + System.Environment.NewLine);
                         break;
                     }
-                }
             }
         }
     }

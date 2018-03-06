@@ -17,7 +17,7 @@ namespace Samus.FileManipulation
             FileInfo file = new FileInfo(sFilename);
             try
             {
-                stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None);
+                stream = file.Open(FileMode.Open, FileAccess.Read);
             }
             catch (IOException)
             {

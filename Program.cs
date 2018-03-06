@@ -17,18 +17,18 @@ namespace Samus
     {
         public static Samus.Player Samus = new Samus.Player("Samus");
 
-        public static string DebugBotPath = @"D:\4th Year CSSE\Samus\MosersCasino\DebugBot.txt";
-        public static string CasinoToBot = @"D:\4th Year CSSE\Samus\MosersCasino\botFiles\casinoToBot1"; //not needed so far
+        public static string DebugBotPath = @"C:\Users\Administrator\Desktop\pokercasino-master\pokercasino-master\botfiles\DebugBot.txt";
+        public static string CasinoToBot = @"C:\Users\Administrator\Desktop\pokercasino-master\pokercasino-master\botfiles\casinoToBot1"; //not needed so far
 
-        public static string BotToCasino = @"D:\4th Year CSSE\Samus\MosersCasino\botFiles\botToCasino1";
+        public static string BotToCasino = @"C:\Users\Administrator\Desktop\pokercasino-master\pokercasino-master\botfiles\botToCasino1";
         
 
         public static int[] FlopCards = new int[3];
 
-        public static string PlayAreaPathEven = @"D:\4th Year CSSE\Samus\Cashino\PokerTesterGCC-master\simulationFiles\playAreaPathEven.txt";
+        public static string PlayAreaPathEven = @"C:\Users\Administrator\Desktop\pokercasino-master\pokercasino-master\botfiles\playAreaPathEven.txt";
         public static string PlayAreaPathOdd = @"D:\4th Year CSSE\Samus\Cashino\PokerTesterGCC-master\simulationFiles\playAreaPathOdd.txt";
 
-        public static string BotDirPath = @"D:\4th Year CSSE\Samus\MosersCasino\botFiles";
+        public static string BotDirPath = @"C:\Users\Administrator\Desktop\pokercasino-master\pokercasino-master\botfiles";
 
         public static string PlayAreaDirPath = @"D:\4th Year CSSE\Samus\Cashino\PokerTesterGCC-master\simulationFiles";
 
@@ -93,10 +93,11 @@ namespace Samus
         {
             FileManipulation.Listeners.StartSummaryFileWatcher(BotDirPath); //working
             File.WriteAllText(DebugBotPath, ""); //Emptying Debugger for new game
-            File.AppendAllText(DebugBotPath, "Main Method Invoked." + System.Environment.NewLine);
+            File.AppendAllText(DebugBotPath, "************************* Main Method Invoked *************************" + System.Environment.NewLine);
             TwoCardRanking.PopulateHashTable(ranking); //generates ranking of all pre-flop hands based on average money won per hand
 
             FileManipulation.Listeners.StartCasinoWatcher(BotDirPath);
+
             while (true)
             {
                 File.AppendAllText(DebugBotPath, "Bot watcher started." + System.Environment.NewLine);
@@ -108,7 +109,6 @@ namespace Samus
                         FileManipulation.Listeners.BotFileChanged = false;
                         BotEventFired(); //gets hand + Position
                         FstAction(); // first to act heads up pre-flop
-                                     //FileManipulation.Listeners.BotFileChanged = false;
                         File.AppendAllText(DebugBotPath, "BotFileChanged = false.\nFirst actions have been performed." + System.Environment.NewLine);
                         break;
                     }
@@ -117,7 +117,7 @@ namespace Samus
                 {
                     if (FileManipulation.Listeners.BotFileChanged)
                     {
-                        // FileManipulation.Listeners.BotFileChanged = false;
+                        FileManipulation.Listeners.BotFileChanged = false;
                         if (FlopFound())
                         {
                             File.AppendAllText(DebugBotPath, "Flop Found" + System.Environment.NewLine);
@@ -129,6 +129,8 @@ namespace Samus
                 Flopper.Start(FlopCards, rank, DealerPosition, DebugBotPath);
                 Turner.Start(CommunityCards, rank, DealerPosition, DebugBotPath);
                 River.Start(CommunityCards, rank, DealerPosition, DebugBotPath);
+
+                File.AppendAllText(DebugBotPath, string.Format("*************************** Hand Finished *************************** ") + System.Environment.NewLine);
             }
         }
         //private static string text1 = null;
@@ -201,8 +203,15 @@ namespace Samus
 
         private static void BotEventFired() //clean
         {
-            string text = System.IO.File.ReadAllText(CasinoToBot); //reading bot file
-
+            string text = null;
+            while (true)
+            {
+                if (FileManipulation.Extractions.IsFileReady(CasinoToBot))
+                {
+                    text = System.IO.File.ReadAllText(CasinoToBot); //reading bot file
+                    break;
+                }
+            }
             Hand = GetWholeCardsAndPosition(text);
 
             File.AppendAllText(DebugBotPath, "Bot File ready.\nCards = \t" + text + "\nHole cards converted: " + Hand + System.Environment.NewLine);

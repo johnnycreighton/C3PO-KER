@@ -52,7 +52,7 @@ namespace Samus
 
             while (true)
             {
-                if (FileManipulation.Listeners.BotFileChanged)
+                 if (FileManipulation.Listeners.BotFileChanged)
                 {
                     FileManipulation.Listeners.BotFileChanged = false;
                     
