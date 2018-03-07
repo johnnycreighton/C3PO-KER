@@ -1,8 +1,6 @@
 ﻿using BluffinMuffin.HandEvaluator;
-using System;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Samus
 {
@@ -50,8 +48,8 @@ namespace Samus
                     }
                     else
                     {
-                        File.AppendAllText(debugBotPath, "Changed bot file to 'c'.  this is for testing purposes only. this is actually a fold. " + System.Environment.NewLine);
-                        File.WriteAllText(BotToCasino, "c");//change to fold after testing
+                        File.AppendAllText(debugBotPath, "Changed bot file to 'f'." + System.Environment.NewLine);
+                        File.WriteAllText(BotToCasino, "f");//change to fold after testing
                                                             //System.Environment.Exit(0);
                         break;
                     }
@@ -59,12 +57,13 @@ namespace Samus
             }
             while (true)
             {
-                
-                    if (FileManipulation.Listeners.SummaryFileChanged)
-                    {
-                        File.AppendAllText(debugBotPath, "Hand finished ! ! !" + System.Environment.NewLine);
-                        break;
-                    }
+                if (FileManipulation.Listeners.SummaryFileChanged)
+                {
+                    FileManipulation.Listeners.SummaryFileChanged = false;
+                    FileManipulation.Listeners.BotFileChanged = false;
+                    File.AppendAllText(debugBotPath, "Hand finished ! ! !" + System.Environment.NewLine);
+                    break;
+                }
             }
         }
     }

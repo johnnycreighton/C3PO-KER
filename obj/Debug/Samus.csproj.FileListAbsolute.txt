@@ -1,3 +1,9 @@
+C:\Users\Administrator\Source\Repos\C3PO-KER\bin\Debug\Samus.exe.config
+C:\Users\Administrator\Source\Repos\C3PO-KER\bin\Debug\Samus.exe
+C:\Users\Administrator\Source\Repos\C3PO-KER\bin\Debug\Samus.pdb
+C:\Users\Administrator\Source\Repos\C3PO-KER\obj\Debug\Samus.exe
+C:\Users\Administrator\Source\Repos\C3PO-KER\obj\Debug\Samus.pdb
+C:\Users\Administrator\Source\Repos\C3PO-KER\obj\Debug\Samus.csprojResolveAssemblyReference.cache
 D:\4th Year CSSE\Samus\Samus\bin\Debug\Samus.exe.config
 D:\4th Year CSSE\Samus\Samus\bin\Debug\Samus.exe
 D:\4th Year CSSE\Samus\Samus\bin\Debug\Samus.pdb
@@ -9,9 +15,4 @@ D:\4th Year CSSE\Samus\Samus\bin\Debug\System.ValueTuple.xml
 D:\4th Year CSSE\Samus\Samus\obj\Debug\Samus.csproj.CoreCompileInputs.cache
 D:\4th Year CSSE\Samus\Samus\obj\Debug\Samus.exe
 D:\4th Year CSSE\Samus\Samus\obj\Debug\Samus.pdb
-C:\Users\Administrator\Source\Repos\C3PO-KER\bin\Debug\Samus.exe.config
-C:\Users\Administrator\Source\Repos\C3PO-KER\bin\Debug\Samus.exe
-C:\Users\Administrator\Source\Repos\C3PO-KER\bin\Debug\Samus.pdb
-C:\Users\Administrator\Source\Repos\C3PO-KER\obj\Debug\Samus.exe
-C:\Users\Administrator\Source\Repos\C3PO-KER\obj\Debug\Samus.pdb
-C:\Users\Administrator\Source\Repos\C3PO-KER\obj\Debug\Samus.csprojResolveAssemblyReference.cache
+D:\4th Year CSSE\Samus\Samus\obj\Debug\Samus.csprojResolveAssemblyReference.cache

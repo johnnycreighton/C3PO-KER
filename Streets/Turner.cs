@@ -58,8 +58,8 @@ namespace Samus.Streets
                     }
                     else
                     {
-                        File.AppendAllText(debugBotPath, "Changed bot file to 'c'.  this is for testing purposes only. this is actually a fold. " + System.Environment.NewLine);
-                        File.WriteAllText(BotToCasino, "c");//change to fold after testing
+                        File.AppendAllText(debugBotPath, "Changed bot file to 'f'" + System.Environment.NewLine);
+                        File.WriteAllText(BotToCasino, "f");//change to fold after testing
                                                       //System.Environment.Exit(0);
                         break;
                     }
@@ -87,6 +87,7 @@ namespace Samus.Streets
                 if (FileManipulation.Extractions.IsFileReady(CasinoToBot))
                 {
                     text = System.IO.File.ReadAllText(CasinoToBot);
+                    
                     break;
                 }
             }
@@ -100,6 +101,7 @@ namespace Samus.Streets
                     ++index;
                     if (digit == 'R')
                     {
+                        File.AppendAllText(Program.DebugBotPath, "River found here =  " + text + System.Environment.NewLine);
                         RiverCard = Convert.ToInt32(Regex.Match(text.Substring(index), @"\d+").Value);
                         FileManipulation.CardTransform.WriteCommunityCards(RiverCard, 4);
                         break;

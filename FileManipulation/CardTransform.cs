@@ -126,13 +126,13 @@ namespace Samus.FileManipulation
                 switch (element.ToString())
                 {
                     case "0":
-                        SuitResultStr[i] = "S";
+                        SuitResultStr[i] = "H";
                         continue;
                     case "1":
                         SuitResultStr[i] = "C";
                         continue;
                     case "2":
-                        SuitResultStr[i] = "H";
+                        SuitResultStr[i] = "S";
                         continue;
                     case "3":
                         SuitResultStr[i] = "D";
@@ -218,13 +218,13 @@ namespace Samus.FileManipulation
             switch (suit.ToString())
             {
                 case "0":
-                    Program.CommunityCards[i] += "S";
+                    Program.CommunityCards[i] += "H";
                     break;
                 case "1":
                     Program.CommunityCards[i] += "C";
                     break;
                 case "2":
-                    Program.CommunityCards[i] += "H";
+                    Program.CommunityCards[i] += "S";
                     break;
                 case "3":
                     Program.CommunityCards[i] += "D";

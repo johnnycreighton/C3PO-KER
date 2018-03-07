@@ -164,13 +164,13 @@ namespace Samus
             switch (suits[0].ToString())
             {
                 case "0":
-                    cardSuitOne = "s";
+                    cardSuitOne = "h";
                     break;
                 case "1":
                     cardSuitOne = "c";
                     break;
                 case "2":
-                    cardSuitOne = "h";
+                    cardSuitOne = "s";
                     break;
                 case "3":
                     cardSuitOne = "d";
@@ -180,13 +180,13 @@ namespace Samus
             switch (suits[1].ToString())
             {
                 case "0":
-                    cardSuitTwo = "s";
+                    cardSuitTwo = "h";
                     break;
                 case "1":
                     cardSuitTwo = "c";
                     break;
                 case "2":
-                    cardSuitTwo = "h";
+                    cardSuitTwo = "s";
                     break;
                 case "3":
                     cardSuitTwo = "d";

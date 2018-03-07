@@ -100,6 +100,7 @@ namespace Samus
                 if (FileManipulation.Extractions.IsFileReady(CasinoToBot))
                 {
                     text = System.IO.File.ReadAllText(CasinoToBot);
+                    
                     break;
                 }
             }
@@ -113,7 +114,7 @@ namespace Samus
                     ++index;
                     if (digit == 'T')
                     {
-                        
+                        File.AppendAllText(DebugBotPath, "Turn found here =  " + text + System.Environment.NewLine);
                         TurnCard = Convert.ToInt32(Regex.Match(text.Substring(index), @"\d+").Value);
                         FileManipulation.CardTransform.WriteCommunityCards(TurnCard, 3);
                         break;
