@@ -13,11 +13,11 @@ namespace Samus.Streets
     {
         private static string CasinoToBot = Program.CasinoToBot;
         private static string BotToCasino = Program.BotToCasino;
-        
+        private static int Rank;
 
         public static int RiverCard;
 
-        internal static void Start(string[] path, int rank, int position, string debugBotPath)
+        internal static void Start(string[] path, int preFlopRank, int position, string debugBotPath)
         {
             File.AppendAllText(debugBotPath, "\nEntered Turn." + System.Environment.NewLine);
 
@@ -36,35 +36,35 @@ namespace Samus.Streets
             File.AppendAllText(debugBotPath, string.Format("Best five card hand post turn: {0}", bestFiveCarder + System.Environment.NewLine));
             HandStrategies.Draws.CheckForDraws(Program.Samus, Program.CommunityCards);
             File.AppendAllText(debugBotPath, "Checked for Draws!" + System.Environment.NewLine);
+            FileManipulation.Listeners.StartSummaryFileWatcher(Program.BotDirPath); //working
+            
+            FileManipulation.Listeners.BotFileChanged = false;
 
-            while (true)
+            Rank = HandStrategies.PotOddsTolerance.GetEnhancedRankings(Program.Samus, bestFiveCarder);
+
+            if (Rank <= 30)
             {
-                if (FileManipulation.Listeners.BotFileChanged)
-                {
-                    FileManipulation.Listeners.BotFileChanged = false;
-
-                    if (rank < 54) //TODO sort his out to have some real strategy
-                    {
-                        File.WriteAllText(BotToCasino, "r");
-                        File.AppendAllText(debugBotPath, "Changed bot file to 'r'." + System.Environment.NewLine);
-                        
-                        break;
-                    }
-                    else if (rank < 93)
-                    {
-                        File.AppendAllText(debugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);
-                        File.WriteAllText(BotToCasino, "c");
-                        break;
-                    }
-                    else
-                    {
-                        File.AppendAllText(debugBotPath, "Changed bot file to 'f'" + System.Environment.NewLine);
-                        File.WriteAllText(BotToCasino, "f");//change to fold after testing
-                                                      //System.Environment.Exit(0);
-                        break;
-                    }
-                }
+                File.WriteAllText(BotToCasino, "c");
+                File.AppendAllText(debugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);
             }
+            else if (Rank >= 30)
+            {
+                File.WriteAllText(BotToCasino, "r");
+                File.AppendAllText(debugBotPath, "Changed bot file to 'r'." + System.Environment.NewLine);
+            }
+            else if (preFlopRank < 5)
+            {
+                File.WriteAllText(BotToCasino, "c");
+                File.AppendAllText(debugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);
+            }
+            else
+            {
+                File.WriteAllText(BotToCasino, "f");
+                File.AppendAllText(debugBotPath, "Changed bot file to 'f'. I missed the flop" + System.Environment.NewLine);
+                Program.HandFinished = true;
+                return;
+            }
+
             while (true)
             {
                 if (FileManipulation.Listeners.BotFileChanged)
@@ -86,16 +86,23 @@ namespace Samus.Streets
             {
                 if (FileManipulation.Extractions.IsFileReady(CasinoToBot))
                 {
-                    text = System.IO.File.ReadAllText(CasinoToBot);
-                    
-                    break;
+                    try
+                    {
+                        text = System.IO.File.ReadAllText(CasinoToBot);
+                        break;
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
             }
-
             int index = 0;
+            if (text == null)
+                return false;
+
             if (text.Contains("R"))
             {
-
                 foreach (var digit in text)
                 {
                     ++index;
@@ -104,13 +111,11 @@ namespace Samus.Streets
                         File.AppendAllText(Program.DebugBotPath, "River found here =  " + text + System.Environment.NewLine);
                         RiverCard = Convert.ToInt32(Regex.Match(text.Substring(index), @"\d+").Value);
                         FileManipulation.CardTransform.WriteCommunityCards(RiverCard, 4);
-                        break;
+                        return true;
                     }
                 }
-                return true;
             }
-            else
-                return false;
+            return false;
         }
     }
 }

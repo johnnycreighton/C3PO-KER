@@ -5,7 +5,7 @@ using System.Collections;
 
 namespace Samus
 {
-    class PreFlop
+   /*class PreFlop
     {
         private static int Dealer;
         private static int BigBlind;
@@ -204,5 +204,5 @@ namespace Samus
                 Program.MainFold = true;
             }
         }
-    }
+    }*/
 }

@@ -15,10 +15,9 @@ namespace Samus
 
         private static bool isHandFinished;
         private static int TurnCard;
+        private static int Rank;
 
-        public static int RaisesFound { get; private set; }
-
-        public static void Start(int[] cardNumbers, int rank, int position, string debugBotPath) // path = play area path 
+        public static void Start(int[] cardNumbers, int preFlopRank, int position, string debugBotPath) // path = play area path 
         {
             File.AppendAllText(debugBotPath, "\nEntered flop." + System.Environment.NewLine);
             //position 2 goes first
@@ -49,36 +48,32 @@ namespace Samus
             HandStrategies.Draws.CheckForDraws(Program.Samus, Program.CommunityCards);
             File.AppendAllText(debugBotPath, "Checked for Draws!" + System.Environment.NewLine);
 
+            Rank = HandStrategies.PotOddsTolerance.GetEnhancedRankings(Program.Samus, bestFiveCarder); 
+
+            if (Rank <= 30 && Rank > 5) 
+            {
+                File.WriteAllText(BotToCasino, "c");
+                File.AppendAllText(debugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);
+            }
+            else if (Rank >= 30)
+            {
+                File.WriteAllText(BotToCasino, "r");
+                File.AppendAllText(debugBotPath, "Changed bot file to 'r'." + System.Environment.NewLine);
+            }
+            else if (preFlopRank < 5 ) 
+            {
+                File.WriteAllText(BotToCasino, "c");
+                File.AppendAllText(debugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);
+            }
+            else
+            {
+                File.WriteAllText(BotToCasino, "f");
+                File.AppendAllText(debugBotPath, "Changed bot file to 'f'. I missed the flop" + System.Environment.NewLine);
+                Program.HandFinished = true;
+                return;
+            }
 
             while (true)
-            {
-                 if (FileManipulation.Listeners.BotFileChanged)
-                {
-                    FileManipulation.Listeners.BotFileChanged = false;
-                    
-                    if (rank < 54) //TODO sort his out to have some real strategy
-                    {
-                        File.WriteAllText(BotToCasino, "r");
-                        File.AppendAllText(debugBotPath, "Changed bot file to 'r'." + System.Environment.NewLine);
-                        ++RaisesFound;
-                        break;
-                    }
-                    else if (rank < 93)
-                    {
-                        File.AppendAllText(debugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);
-                        File.WriteAllText(BotToCasino, "c");
-                        break;
-                    }
-                    else
-                    {
-                        File.AppendAllText(debugBotPath, "Changed bot file to 'c'.  this is for testing purposes only. this is actually a fold. " + System.Environment.NewLine);
-                        File.WriteAllText(BotToCasino, "c");//change to fold after testing
-                        isHandFinished = true;                                //System.Environment.Exit(0);
-                        break;
-                    }
-                }
-            }
-            while(true)
             {
                 if (FileManipulation.Listeners.BotFileChanged)
                 {
@@ -86,7 +81,7 @@ namespace Samus
                     if (TurnFound())
                     {
                         File.AppendAllText(DebugBotPath, "Turn Found" + System.Environment.NewLine);
-                        break;
+                        return;
                     }
                 }
             }
@@ -95,15 +90,16 @@ namespace Samus
         private static bool TurnFound()
         {
             string text = null;
-            while (true)
+
+            if (FileManipulation.Extractions.IsFileReady(CasinoToBot))
             {
-                if (FileManipulation.Extractions.IsFileReady(CasinoToBot))
-                {
-                    text = System.IO.File.ReadAllText(CasinoToBot);
-                    
-                    break;
-                }
+                text = System.IO.File.ReadAllText(CasinoToBot);
             }
+            else
+            {
+                return false;
+            }
+            
 
             int index = 0;
             if (text.Contains("T"))

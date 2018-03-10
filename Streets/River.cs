@@ -8,8 +8,9 @@ namespace Samus
     {
         private static string CasinoToBot = Program.CasinoToBot;
         private static string BotToCasino = Program.BotToCasino;
-        
-        internal static void Start(string[] path, int rank, int position, string debugBotPath)
+        private static int Rank;
+
+        internal static void Start(string[] path, int preFlopRank, int position, string debugBotPath)
         {
             File.AppendAllText(debugBotPath, "\nEntered River." + System.Environment.NewLine);
 
@@ -26,42 +27,47 @@ namespace Samus
             }
             Program.Samus.Hand = bestFiveCarder.Hand.ToString();
             File.AppendAllText(debugBotPath, string.Format("Best five card hand post River: {0}", bestFiveCarder + System.Environment.NewLine));
-
-            while (true)
+            Rank = HandStrategies.PotOddsTolerance.GetRiverRankings(bestFiveCarder);
+            while (true) //not needed i think
             {
                 if (FileManipulation.Listeners.BotFileChanged)
                 {
-                    FileManipulation.Listeners.BotFileChanged = false;
-
-                    if (rank < 54) //TODO sort his out to have some real strategy
+                    if (Rank > 20)
                     {
-                        File.WriteAllText(BotToCasino, "c"); // should be raising. TODO
+                        File.WriteAllText(BotToCasino, "r");
                         File.AppendAllText(debugBotPath, "Changed bot file to 'r'." + System.Environment.NewLine);
-
                         break;
                     }
-                    else if (rank < 93)
+                    else if (Rank <= 0)
                     {
-                        File.AppendAllText(debugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);
-                        File.WriteAllText(BotToCasino, "c");
-                        break;
+                        File.WriteAllText(BotToCasino, "f");
+                        File.AppendAllText(debugBotPath, "Changed bot file to 'f'." + System.Environment.NewLine);
+                        Program.HandFinished = true;
+                        return;
                     }
                     else
                     {
-                        File.AppendAllText(debugBotPath, "Changed bot file to 'f'." + System.Environment.NewLine);
-                        File.WriteAllText(BotToCasino, "f");//change to fold after testing
-                                                            //System.Environment.Exit(0);
+                        File.WriteAllText(BotToCasino, "c");
+                        File.AppendAllText(debugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);
                         break;
                     }
                 }
             }
+        
             while (true)
             {
                 if (FileManipulation.Listeners.SummaryFileChanged)
                 {
-                    FileManipulation.Listeners.SummaryFileChanged = false;
+                   if (FileManipulation.Extractions.IsFileReady(CasinoToBot))
+                   {
+                       string text = System.IO.File.ReadAllText(CasinoToBot);
+                       File.AppendAllText(debugBotPath, "text when the summary file has changed, should be finished  = " +  text + System.Environment.NewLine); //testing
+                       break;
+                   }
+
                     FileManipulation.Listeners.BotFileChanged = false;
-                    File.AppendAllText(debugBotPath, "Hand finished ! ! !" + System.Environment.NewLine);
+                    FileManipulation.Listeners.SummaryFileChanged = false;
+                    File.AppendAllText(debugBotPath, "*************************** Hand finished ***************************" + System.Environment.NewLine);
                     break;
                 }
             }

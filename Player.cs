@@ -15,13 +15,9 @@ namespace Samus
         public Card FirstCard;
         public Card SecondCard;
 
-        public bool AllIn;
-        public bool Button;
-        public bool check;
-        public bool Fold;
+        
         public bool FlushDraw;
         public bool BackDoorFlushDraw;
-        public bool StraightDraw;
         public bool BackDoorStraightDraw;
         public bool OpenEndedStraightDraw;
         public bool GutShotStraightDraw;

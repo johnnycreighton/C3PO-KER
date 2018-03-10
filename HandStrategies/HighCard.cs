@@ -13,18 +13,18 @@
         internal static void Action(Player actionplayer, bool flop)
         {
 
-            Resets.ReuseableMethods.ResetFlags(); // need to reset flags related to this file, currently resetting pre-flop ones.
+            //Resets.ReuseableMethods.ResetFlags(); // need to reset flags related to this file, currently resetting pre-flop ones.
 
-            //if drawing, try get to the turn cheap. if not bail.
-            PotOddsTolerance.CalculateTolerance(actionplayer, flop);
+            ////if drawing, try get to the turn cheap. if not bail.
+            //PotOddsTolerance.CalculateTolerance(actionplayer, flop);
 
-            if (actionplayer.Tolerance == 0)
-            {
-                actionplayer.check = true;
-                return;
-            }
+            //if (actionplayer.Tolerance == 0)
+            //{
+                //actionplayer.check = true;
+                //return;
+            //}
 
-            int x = 0;
+            //int x = 0;
 
 
         }

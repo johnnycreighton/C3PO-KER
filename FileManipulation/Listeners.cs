@@ -2,27 +2,25 @@
 
 namespace Samus.FileManipulation
 {
-    public static class Listeners
+    public class Listeners
     {
         public static FileSystemWatcher BotWatcher = new FileSystemWatcher();
-        public static FileSystemWatcher PlayAreaEvenWatcher = new FileSystemWatcher();
-        public static FileSystemWatcher PlayAreaOddWatcher = new FileSystemWatcher();
+        public static FileSystemWatcher SummaryWatcher = new FileSystemWatcher();
 
         public static bool BotFileChanged;
-        public static bool PlayAreaEvenFileChanged;
-        public static bool PlayAreaOddFileChanged;
 
         public static bool SummaryFileChanged;
 
         public static void StartSummaryFileWatcher(string path)
         {
-            BotWatcher.Path = path;
-            BotWatcher.NotifyFilter = NotifyFilters.LastWrite;
-            BotWatcher.Filter = "handSummary*";
+            SummaryFileChanged = false;
+            SummaryWatcher.Path = path;
+            SummaryWatcher.NotifyFilter = NotifyFilters.LastWrite;
+            SummaryWatcher.Filter = "handSummary*";
 
-            BotWatcher.Changed += new FileSystemEventHandler(SummaryFileChange);
+            SummaryWatcher.Changed += new FileSystemEventHandler(SummaryFileChange);
             // Begin watching.
-            BotWatcher.EnableRaisingEvents = true;
+            SummaryWatcher.EnableRaisingEvents = true;
         }
 
         public static void StartCasinoWatcher(string path)
@@ -48,11 +46,8 @@ namespace Samus.FileManipulation
 
         public static void StopWatcher(string path)
         {
-            
-            
-                BotWatcher.EnableRaisingEvents = false;
-                BotWatcher.Changed -= new FileSystemEventHandler(BotFileChange);
-            
+            BotWatcher.EnableRaisingEvents = false;
+            BotWatcher.Changed -= new FileSystemEventHandler(BotFileChange);
             BotFileChanged = false;
         }
     }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Samus
 {
-    class Flop
+  /*  class Flop
     {
 
         private static int Dealer;
@@ -122,5 +122,5 @@ namespace Samus
 
 
         }*/
-    }
+    //}
 }

@@ -13,7 +13,7 @@ using Samus.Streets;
 
 namespace Samus
 {
-    public class Program
+    public class Program : FileManipulation.Listeners
     {
         public static Samus.Player Samus = new Samus.Player("Samus");
         public static string DebugBotPath = @"D:\4th Year CSSE\Samus\MosersCasino\DebugBot.txt";
@@ -31,9 +31,8 @@ namespace Samus
 
         public static string PlayAreaDirPath = @"D:\4th Year CSSE\Samus\Cashino\PokerTesterGCC-master\simulationFiles";
 
-        private static int RaisesFound = 0;
         private static bool HandFetched;
-        private static bool HandFinished;
+        public static bool HandFinished;
 
         private static string[] lines = new string[100];
         private static string playAreaLocation;
@@ -57,7 +56,6 @@ namespace Samus
         public static int DealerPosition;
 
         public static int rank;
-        private static int handNumber = 1;
 
         public static int MyWinnings;
         public static int OpponentsWinnings;
@@ -66,6 +64,7 @@ namespace Samus
 
         public static Hashtable ranking = new Hashtable();
         private static bool firstRound = true;
+        private static int thuh = 0;
 
         public class Player : IStringCardsHolder
         {
@@ -90,7 +89,7 @@ namespace Samus
 
         private static void Main()
         {
-            FileManipulation.Listeners.StartSummaryFileWatcher(BotDirPath); //working
+            
             File.WriteAllText(DebugBotPath, ""); //Emptying Debugger for new game
             File.AppendAllText(DebugBotPath, "************************* Main Method Invoked *************************" + System.Environment.NewLine);
             TwoCardRanking.PopulateHashTable(ranking); //generates ranking of all pre-flop hands based on average money won per hand
@@ -100,39 +99,40 @@ namespace Samus
             while (true)
             {
                 HandFinished = false;
-               // FileManipulation.Listeners.BotFileChanged = false;
-                File.AppendAllText(DebugBotPath, "Bot watcher started." + System.Environment.NewLine);
-                File.AppendAllText(DebugBotPath, "\nHand Number: " + ++Counter + "\nBotFileChanged = true." + System.Environment.NewLine);
+                HandFetched = false;
+                File.AppendAllText(DebugBotPath, "\n\n\n\nNew Hand, Number: " + Counter + "\n" +System.Environment.NewLine);
                 while (true)//first action pre-flop
                 {
-                    if (FileManipulation.Listeners.BotFileChanged)
+                    
+                    if (BotFileChanged)
                     {
-                        FileManipulation.Listeners.BotFileChanged = false;
-                        BotEventFired(); //gets hand + Position
+                        BotFileChanged = false;
+                        HandFetched = false;
+                        BotEventFired(Counter); //gets hand + Position
                         if (HandFetched)
                         {
                             FstAction(); // first to act heads up pre-flop
-                            File.AppendAllText(DebugBotPath, "BotFileChanged = false.\nFirst actions have been performed." + System.Environment.NewLine);
+                            File.AppendAllText(DebugBotPath, "First actions have been performed." + System.Environment.NewLine);
                             break;
                         }
                     }
                 }
-                while (true)
-                {
-                    if (FileManipulation.Listeners.BotFileChanged)
-                    {
-                        FileManipulation.Listeners.BotFileChanged = false;
-                        if (FlopFound())
-                        {
-                            File.AppendAllText(DebugBotPath, "Flop Found" + System.Environment.NewLine);
-                            break;
-                        }
-                    }
-                }
-                File.AppendAllText(DebugBotPath, string.Format("\nHeaded for the flop with cards {0} {1}", Samus.FirstCard, Samus.SecondCard) + System.Environment.NewLine);
                 if (!HandFinished)
                 {
-                    Flopper.Start(FlopCards, rank, DealerPosition, DebugBotPath);
+                    while (true)
+                    {
+                        if (BotFileChanged)
+                        {
+                            BotFileChanged = false;
+                            if (FlopFound())
+                            {
+                                File.AppendAllText(DebugBotPath, "Flop Found" + System.Environment.NewLine);
+                                File.AppendAllText(DebugBotPath, Format("\nHeaded for the flop with cards {0} {1}", Samus.FirstCard, Samus.SecondCard) + System.Environment.NewLine);
+                                Flopper.Start(FlopCards, rank, DealerPosition, DebugBotPath);
+                                break;
+                            }
+                        }
+                    }
                 }
                 if (!HandFinished)
                 {
@@ -142,8 +142,6 @@ namespace Samus
                 {
                     River.Start(CommunityCards, rank, DealerPosition, DebugBotPath);
                 }
-                
-                File.AppendAllText(DebugBotPath, string.Format(System.Environment.NewLine + "*************************** Hand Finished *************************** ") + System.Environment.NewLine);
             }
         }
         //private static string text1 = null;
@@ -185,19 +183,15 @@ namespace Samus
 
         private static void FstAction()
         {
-            File.AppendAllText(DebugBotPath, "First action" + System.Environment.NewLine);
-
             while (true)
             {
-                if (rank < 54 && RaisesFound < 4)
+                if (rank < 54)
                 {
                     File.AppendAllText(DebugBotPath, "Changed bot file to 'r'." + System.Environment.NewLine);
                     File.WriteAllText(BotToCasino, "r");
-                    ++RaisesFound;
-
                     break;
                 }
-                else if (rank < 93 || RaisesFound == 3)
+                else if (rank < 93)
                 {
                     File.AppendAllText(DebugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);
                     File.WriteAllText(BotToCasino, "c");
@@ -205,38 +199,70 @@ namespace Samus
                 }
                 else
                 {
-                    File.AppendAllText(DebugBotPath, "Changed bot file to 'f'." + System.Environment.NewLine);
+                    File.AppendAllText(DebugBotPath, "Changed bot file to 'f' Exiting hand." + System.Environment.NewLine);
                     File.WriteAllText(BotToCasino, "f");
-                    //System.Environment.Exit(0); //for single hand termination
                     HandFinished = true;
+                    System.Threading.Thread.Sleep(50);
                     break;
                 }
             }
         }
 
-        private static void BotEventFired() //clean
+        private static void BotEventFired(int counter) //clean
         {
             string text = null;
+            //here:
             while (true)
             {
                 if (FileManipulation.Extractions.IsFileReady(CasinoToBot))
                 {
-                    text = System.IO.File.ReadAllText(CasinoToBot); //reading bot file
-                    break;
+                    try
+                    {
+                        text = System.IO.File.ReadAllText(CasinoToBot); //reading bot file
+                        break;
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
             }
-            if(!text.Contains("A")) // FIX
+            if (Counter == 2)
             {
+                thuh = 0; // when this hits it has already fucked up
+            }
+            if (Counter == 1)
+            {
+                thuh = 0;
+            }
+            if (!text.Contains("A")) // counter needed to make sure hand numbers are synced
+            {
+                File.AppendAllText(DebugBotPath, "Hand not available " + text + System.Environment.NewLine);
                 HandFetched = false;
                 return;
+                
+                // HandFetched = false;
+                // File.AppendAllText(DebugBotPath, "Hand not available " + text + System.Environment.NewLine);
+                // return;
             }
-            Hand = GetWholeCardsAndPosition(text);
 
+            int handNumber = Convert.ToInt32(Regex.Match(text, @"\d+").Value);
+
+
+            //if (counter != handNumber) // counter needed to make sure hand numbers are synced
+            //{
+            //    HandFetched = false;
+            //    File.AppendAllText(DebugBotPath, counter + " doesnt equal " + handNumber + System.Environment.NewLine); // this is a hack, its still skipping hands but at least i am catching back up
+            //    return;
+            //}
+
+            Hand = GetWholeCardsAndPosition(text);
             HandFetched = true;
+            ++Counter;
             File.AppendAllText(DebugBotPath, "Bot File ready.\nCards = \t" + text + "\nHole cards converted: " + Hand + System.Environment.NewLine);
             foreach (DictionaryEntry elem in ranking) //Gets Rank
             {
-                if (Hand[0] == Hand[1])//different algo for pairs.
+                if (Hand[0] == Hand[1])//different algorithm for pairs.
                 {
                     if (elem.Value.ToString().Substring(0, 1).Contains(Hand[0]) && elem.Value.ToString().Substring(1, 1).Contains(Hand[1]))
                     {
@@ -255,7 +281,6 @@ namespace Samus
             }
             if (rank > 0)
             {
-                HandFetched = true;
                 File.AppendAllText(DebugBotPath, "Rank Found:\t" + rank + System.Environment.NewLine);
             }
             else
@@ -557,7 +582,6 @@ namespace Samus
             else
                 hand += "o";
 
-            HandFetched = true; // MAY NOT NEED THIS 
             return hand;
         }
 
