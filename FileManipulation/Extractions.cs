@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Samus.FileManipulation
 {
     public class Extractions
     {
-
+        /// <summary>
+        /// Check if file is ready.
+        /// </summary>
+        /// <param name="sFilename"></param>
+        /// <returns></returns>
         public static bool IsFileReady(String sFilename)
         {
             FileStream stream = null;
@@ -37,9 +37,14 @@ namespace Samus.FileManipulation
             return true;
         }
 
+        /// <summary>
+        /// Returns Turn card number
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <returns></returns>
         internal static int GetTurnCardNumber(string[] lines)
         {
-            File.AppendAllText(Program.DebugBotPath, "Getting TURN card number..." + System.Environment.NewLine);
+           // File.AppendAllText(Program.DebugBotPath, "Getting TURN card number..." + System.Environment.NewLine);
 
             foreach (string line in lines) //try catch this
             {
@@ -52,9 +57,14 @@ namespace Samus.FileManipulation
             throw new Exception("TURN card not here. test this method.");
         }
 
+        /// <summary>
+        /// Retrieves flop card numbers from a text file
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <returns></returns>
         public static string[] GetFlopCardNumbers(string[] lines)
         {
-            File.AppendAllText(Program.DebugBotPath, "Getting FLOP card numbers..." + System.Environment.NewLine);
+            //File.AppendAllText(Program.DebugBotPath, "Getting FLOP card numbers..." + System.Environment.NewLine);
 
             foreach (string line in lines) //try catch this
             {
@@ -63,7 +73,7 @@ namespace Samus.FileManipulation
                     return Regex.Split(line, @"\D+"); //returns string array of numbers, which are the  flop cards.
                 }    
             }
-            File.AppendAllText(Program.DebugBotPath, "Flop wasnt found, EXITING PROGRAM." + System.Environment.NewLine);
+           // File.AppendAllText(Program.DebugBotPath, "Flop wasnt found, EXITING PROGRAM." + System.Environment.NewLine);
             System.Environment.Exit(0);
             return null;
             //throw new Exception("FLOP not here. test this method.");

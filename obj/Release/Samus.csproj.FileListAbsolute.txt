@@ -1,0 +1,12 @@
+D:\4th Year CSSE\Samus\Samus\bin\Release\Samus.exe.config
+D:\4th Year CSSE\Samus\Samus\bin\Release\Samus.exe
+D:\4th Year CSSE\Samus\Samus\bin\Release\Samus.pdb
+D:\4th Year CSSE\Samus\Samus\bin\Release\BluffinMuffin.HandEvaluator.dll
+D:\4th Year CSSE\Samus\Samus\bin\Release\HandEvaluator.dll
+D:\4th Year CSSE\Samus\Samus\bin\Release\System.ValueTuple.dll
+D:\4th Year CSSE\Samus\Samus\bin\Release\HandEvaluator.xml
+D:\4th Year CSSE\Samus\Samus\bin\Release\System.ValueTuple.xml
+D:\4th Year CSSE\Samus\Samus\obj\Release\Samus.csproj.CoreCompileInputs.cache
+D:\4th Year CSSE\Samus\Samus\obj\Release\Samus.exe
+D:\4th Year CSSE\Samus\Samus\obj\Release\Samus.pdb
+D:\4th Year CSSE\Samus\Samus\obj\Release\Samus.csprojResolveAssemblyReference.cache

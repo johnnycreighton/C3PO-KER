@@ -1,5 +1,8 @@
 ﻿namespace Samus
 {
+    /// <summary>
+    /// Card object needed for player strategy
+    /// </summary>
     public class Card
     {
         public string face;

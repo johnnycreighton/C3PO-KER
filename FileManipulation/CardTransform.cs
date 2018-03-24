@@ -10,6 +10,11 @@ namespace Samus.FileManipulation
         private static string[] CardResultStr = new string[3];
         private static string[] SuitResultStr = new string[3];
 
+        /// <summary>
+        /// Will set the community cards into readable face and suits using the ref keyword
+        /// </summary>
+        /// <param name="cardNumbers"></param>
+        /// <param name="communityCards"></param>
         internal static void Flop(string[] cardNumbers, ref string[] communityCards)
         {
             int i = -1;
@@ -26,24 +31,6 @@ namespace Samus.FileManipulation
                 communityCards[i] = CardResultStr[i] + SuitResultStr[i]; //populates community cards using the ref keyword.
             }
         }
-        /*
-         *  int i = 0;
-            foreach(var number in cardNumbers)
-            {
-                if (number.Length < 1)
-                    continue;
-                GetCardNumber(number, i); //gets card number and suits
-                GetCardSuit(number, i);
-                ++i;
-            }
-
-            ExposeCards(-1); //translates numbers into cards + suits
-
-            for (i = 0; i < 3; ++i)
-            {
-                communityCards[i] = CardResultStr[i] + SuitResultStr[i]; //populates community cards using the ref keyword.
-            }
-         */
 
         internal static void Turn(int turnNumber, ref string[] communityCards)
         {
@@ -55,6 +42,10 @@ namespace Samus.FileManipulation
             communityCards[3] = CardResultStr[0] + SuitResultStr[0]; //populates community cards using the ref keyword. // value in CardResultString will get overwritten here but we dont care. 
         }
 
+        /// <summary>
+        /// Turns the numbers of cards into faces and suits
+        /// </summary>
+        /// <param name="i"></param>
         internal static void ExposeCards(int i)
         {
             foreach (var element in CardResult)
@@ -150,63 +141,69 @@ namespace Samus.FileManipulation
              */
         }
 
-        internal static void WriteCommunityCards(int card, int i) // extend to flop
+        /// <summary>
+        /// method to store the actual community cards in the holder
+        /// An index is sent in to determine which position to insert the card into
+        /// </summary>
+        /// <param name="card"></param>
+        /// <param name="index"></param>
+        internal static void WriteCommunityCards(int card, int index)
         {
             int face = card / 4;
             int suit = card % 4;
 
-            switch (face.ToString())
+            switch (face.ToString()) //switch statements for speed.
             {
                 case "0":
-                    Program.CommunityCards[i] = "2";
+                    Program.CommunityCards[index] = "2";
                     break;
 
                 case "1":
-                    Program.CommunityCards[i] = "3";
+                    Program.CommunityCards[index] = "3";
                     break;
 
                 case "2":
-                    Program.CommunityCards[i] = "4";
+                    Program.CommunityCards[index] = "4";
                     break;
 
                 case "3":
-                    Program.CommunityCards[i] = "5";
+                    Program.CommunityCards[index] = "5";
                     break;
 
                 case "4":
-                    Program.CommunityCards[i] = "6";
+                    Program.CommunityCards[index] = "6";
                     break;
 
                 case "5":
-                    Program.CommunityCards[i] = "7";
+                    Program.CommunityCards[index] = "7";
                     break;
 
                 case "6":
-                    Program.CommunityCards[i] = "8";
+                    Program.CommunityCards[index] = "8";
                     break;
 
                 case "7":
-                    Program.CommunityCards[i] = "9";
+                    Program.CommunityCards[index] = "9";
                     break;
 
                 case "8":
-                    Program.CommunityCards[i] = "10";
+                    Program.CommunityCards[index] = "10";
                     break;
 
                 case "9":
-                    Program.CommunityCards[i] = "J";
+                    Program.CommunityCards[index] = "J";
                     break;
 
                 case "10":
-                    Program.CommunityCards[i] = "Q";
+                    Program.CommunityCards[index] = "Q";
                     break;
 
                 case "11":
-                    Program.CommunityCards[i] = "K";
+                    Program.CommunityCards[index] = "K";
                     break;
 
                 case "12":
-                    Program.CommunityCards[i] = "A";
+                    Program.CommunityCards[index] = "A";
                     break;
 
                 default:
@@ -218,16 +215,16 @@ namespace Samus.FileManipulation
             switch (suit.ToString())
             {
                 case "0":
-                    Program.CommunityCards[i] += "H";
+                    Program.CommunityCards[index] += "H";
                     break;
                 case "1":
-                    Program.CommunityCards[i] += "C";
+                    Program.CommunityCards[index] += "C";
                     break;
                 case "2":
-                    Program.CommunityCards[i] += "S";
+                    Program.CommunityCards[index] += "S";
                     break;
                 case "3":
-                    Program.CommunityCards[i] += "D";
+                    Program.CommunityCards[index] += "D";
                     break;
             }
         }

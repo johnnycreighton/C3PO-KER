@@ -23,26 +23,25 @@ namespace Samus.FileManipulation
             SummaryWatcher.EnableRaisingEvents = true;
         }
 
-        public static void StartCasinoWatcher(string path)
+        public static void StartCasinoWatcher(string path) // Start watching a directory 
         {
             BotWatcher.Path = path;
-            BotWatcher.NotifyFilter = NotifyFilters.LastWrite;
-            BotWatcher.Filter = "*casinoToBot1*";
+            BotWatcher.NotifyFilter = NotifyFilters.LastWrite; //only listen for a new write
+            BotWatcher.Filter = "*casinoToBot1*"; //filter to the specific file
 
-            BotWatcher.Changed += new FileSystemEventHandler(BotFileChange);
-            // Begin watching.
-            BotWatcher.EnableRaisingEvents = true;
+            BotWatcher.Changed += new FileSystemEventHandler(BotFileChange); // method to be triggered when file is changed
+            BotWatcher.EnableRaisingEvents = true; //Begin watching
         }
 
+        public static void BotFileChange(object source, FileSystemEventArgs e)
+        {
+            BotFileChanged = true; // Triggered when the bot file has changed
+        }
         public static void SummaryFileChange(object source, FileSystemEventArgs e)
         {
             SummaryFileChanged = true;
         }
 
-        public static void BotFileChange(object source, FileSystemEventArgs e)
-        {
-            BotFileChanged = true;
-        }
 
         public static void StopWatcher(string path)
         {

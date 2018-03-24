@@ -8,63 +8,34 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Samus.Streets;
 
-
-//using System.ValueTuple;
-
 namespace Samus
 {
     public class Program : FileManipulation.Listeners
     {
-        public static Samus.Player Samus = new Samus.Player("Samus");
-        public static string DebugBotPath = @"D:\4th Year CSSE\Samus\MosersCasino\DebugBot.txt";
-        public static string CasinoToBot = @"D:\4th Year CSSE\Samus\MosersCasino\botFiles\casinoToBot1"; //not needed so far
+        public static Samus.Player Samus = new Samus.Player("Samus"); //player creation
 
-        public static string BotToCasino = @"D:\4th Year CSSE\Samus\MosersCasino\botFiles\botToCasino1";
+       // public static string DebugBotPath = @"Specify path to casino files";
+        public static string CasinoToBot = @"Specify Path to casino files";
+        public static string BotToCasino = @"Specify Path to casino files";
+        public static string BotDirPath = @"Specify Path to casino files";
+        public static string Hand;
 
-
-        public static int[] FlopCards = new int[3];
-
-        public static string PlayAreaPathEven = @"D:\4th Year CSSE\Samus\Cashino\PokerTesterGCC-master\simulationFiles\playAreaPathEven.txt";
-        public static string PlayAreaPathOdd = @"D:\4th Year CSSE\Samus\Cashino\PokerTesterGCC-master\simulationFiles\playAreaPathOdd.txt";
-
-        public static string BotDirPath = @"D:\4th Year CSSE\Samus\MosersCasino\botFiles";
-
-        public static string PlayAreaDirPath = @"D:\4th Year CSSE\Samus\Cashino\PokerTesterGCC-master\simulationFiles";
-
+        public static int[] FlopCards = new int[3]; //low level card numbers
+        
         private static bool HandFetched;
-        public static bool HandFinished;
+        public static bool Folded;
 
         private static string[] lines = new string[100];
-        private static string playAreaLocation;
+        public static string[] CommunityCards = new String[5];
 
-        public static bool MainAllIn;
-        public static bool MainFold;
-        public static int SmallBlind = 25;
-        public static int BigBlind = 50;
-        public static int Pot;
-        public static string Path; // only for single hands run.
-
-        public static string Hand;
-        public static int i = -1;
-
-        private static bool FirstAction = true;
-
-        public static int Counter = 0;
+        public static int Counter;
+        public static int DealerPosition;
+        public static int rank;
 
         public static object[] Cards = new object[2];
         public static object[] Suits = new object[2];
-        public static int DealerPosition;
-
-        public static int rank;
-
-        public static int MyWinnings;
-        public static int OpponentsWinnings;
-
-        public static String[] CommunityCards = new String[5];
-
+        
         public static Hashtable ranking = new Hashtable();
-        private static bool firstRound = true;
-        private static int thuh = 0;
 
         public class Player : IStringCardsHolder
         {
@@ -88,77 +59,98 @@ namespace Samus
         }
 
         private static void Main()
-        {
+        {   
+            //Debugger files everywhere to track actions and possible bugs // all commented out for speed in tournament.
+            // File.WriteAllText(DebugBotPath, ""); //Emptying Debugger for new game
+            // File.AppendAllText(DebugBotPath, "************************* Main Method Invoked *************************" + System.Environment.NewLine);
             
-            File.WriteAllText(DebugBotPath, ""); //Emptying Debugger for new game
-            File.AppendAllText(DebugBotPath, "************************* Main Method Invoked *************************" + System.Environment.NewLine);
             TwoCardRanking.PopulateHashTable(ranking); //generates ranking of all pre-flop hands based on average money won per hand
+            StartCasinoWatcher(BotDirPath); //start watching file
 
-            FileManipulation.Listeners.StartCasinoWatcher(BotDirPath);
-
-            while (true)
+            while (true) // loop forever to play infinite hands.
             {
-                HandFinished = false;
-                HandFetched = false;
-                File.AppendAllText(DebugBotPath, "\n\n\n\nNew Hand, Number: " + Counter + "\n" +System.Environment.NewLine);
-                while (true)//first action pre-flop
+                action = 'g'; //used so bot knows what decision it made prior
+                Samus.BackDoorFlushDraw = false;
+                Samus.BackDoorStraightDraw = false;
+                Samus.FlushDraw = false;
+                Samus.GutShotStraightDraw = false;
+                Samus.OpenEndedStraightDraw = false; 
+
+                if (CommunityCards[0] != null)
                 {
-                    
-                    if (BotFileChanged)
+                    for (int i = 0; i < CommunityCards.Length; i++)
+                    {
+                        CommunityCards[i] = null;
+                    }
+                }
+                Folded = false;
+                HandFetched = false; //resetting all variables
+
+                //File.AppendAllText(DebugBotPath, "\n\n\n\nNew Hand, Number: " + Counter + "\n" +System.Environment.NewLine);
+
+                while (true)//first action pre-flop, wait for cards
+                {
+                    if (BotFileChanged) //this changes when bot file has been written to
                     {
                         BotFileChanged = false;
                         HandFetched = false;
                         BotEventFired(Counter); //gets hand + Position
                         if (HandFetched)
                         {
-                            FstAction(); // first to act heads up pre-flop
-                            File.AppendAllText(DebugBotPath, "First actions have been performed." + System.Environment.NewLine);
+                            FirstAction(); // first to act
+                            // File.AppendAllText(DebugBotPath, "First actions have been performed." + System.Environment.NewLine);
                             break;
                         }
                     }
                 }
-                if (!HandFinished)
+                if (!Folded) //if not folded continue
                 {
                     while (true)
                     {
-                        if (BotFileChanged)
+                        if (BotFileChanged) //waiting for flop
                         {
                             BotFileChanged = false;
                             if (FlopFound())
                             {
-                                File.AppendAllText(DebugBotPath, "Flop Found" + System.Environment.NewLine);
-                                File.AppendAllText(DebugBotPath, Format("\nHeaded for the flop with cards {0} {1}", Samus.FirstCard, Samus.SecondCard) + System.Environment.NewLine);
-                                Flopper.Start(FlopCards, rank, DealerPosition, DebugBotPath);
+                                //  File.AppendAllText(DebugBotPath, "Flop Found" + System.Environment.NewLine);
+                                //  File.AppendAllText(DebugBotPath, Format("\nHeaded for the flop with cards {0} {1}", Samus.FirstCard, Samus.SecondCard) + System.Environment.NewLine);
+                                Flopper.Start(FlopCards, rank, DealerPosition, action);
                                 break;
                             }
                         }
                     }
                 }
-                if (!HandFinished)
+                if (!Folded)
                 {
-                    Turner.Start(CommunityCards, rank, DealerPosition, DebugBotPath);
+                    Turner.Start(CommunityCards, rank, DealerPosition);
                 }
-                if (!HandFinished)
+                if (!Folded)
                 {
-                    River.Start(CommunityCards, rank, DealerPosition, DebugBotPath);
+                    River.Start(CommunityCards, rank, DealerPosition, Turner.action);
                 }
             }
         }
-        //private static string text1 = null;
+
         private static bool FlopFound()
         {
             string text = null;
-
-            if (FileManipulation.Extractions.IsFileReady(CasinoToBot))
+            here:
+            if (FileManipulation.Extractions.IsFileReady(CasinoToBot)) // check if file is ready to read
             {
-                text = System.IO.File.ReadAllText(CasinoToBot);
+                try
+                {
+                    text = System.IO.File.ReadAllText(CasinoToBot);
+                }
+                catch
+                { goto here; }
+
             }
             else
             {
-                return false;
+                return false; // go back to loop and continue waiting
             }
-            
-            if (text.Contains("F"))
+
+            if (text.Contains("F")) //Flop found here
             {
                 int index = 0;
                 int position = 0;
@@ -168,7 +160,7 @@ namespace Samus
                     if (digit == 'F')
                     {
                         var f = text.Substring(index);
-                        FlopCards[position++] = Convert.ToInt32(Regex.Match(text.Substring(index), @"\d+").Value);
+                        FlopCards[position++] = Convert.ToInt32(Regex.Match(text.Substring(index), @"\d+").Value); //setting flop cards
                         if (position == 3)
                         {
                             break;
@@ -181,37 +173,40 @@ namespace Samus
                 return false;
         }
 
-        private static void FstAction()
+        public static char action;
+
+        private static void FirstAction()
         {
             while (true)
             {
-                if (rank < 54)
+                if (rank < 48) //previous == 54
                 {
-                    File.AppendAllText(DebugBotPath, "Changed bot file to 'r'." + System.Environment.NewLine);
+                    action = 'r';
+                    // File.AppendAllText(DebugBotPath, "Changed bot file to 'r'." + System.Environment.NewLine);
                     File.WriteAllText(BotToCasino, "r");
                     break;
                 }
-                else if (rank < 93)
+                else if (rank < 111)//previous == 93
                 {
-                    File.AppendAllText(DebugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);
+                    action = 'c';
+                    // File.AppendAllText(DebugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);
                     File.WriteAllText(BotToCasino, "c");
                     break;
                 }
                 else
                 {
-                    File.AppendAllText(DebugBotPath, "Changed bot file to 'f' Exiting hand." + System.Environment.NewLine);
+                    //  File.AppendAllText(DebugBotPath, "Changed bot file to 'f' Exiting hand." + System.Environment.NewLine);
                     File.WriteAllText(BotToCasino, "f");
-                    HandFinished = true;
-                    System.Threading.Thread.Sleep(50);
+                    Folded = true;
+                    System.Threading.Thread.Sleep(50); // waiting for hand to be played
                     break;
                 }
             }
         }
 
-        private static void BotEventFired(int counter) //clean
+        private static void BotEventFired(int counter) 
         {
             string text = null;
-            //here:
             while (true)
             {
                 if (FileManipulation.Extractions.IsFileReady(CasinoToBot))
@@ -223,43 +218,22 @@ namespace Samus
                     }
                     catch
                     {
-                        continue;
+                        continue; //if error, even after checking if ready, continue on the loop and try again
                     }
                 }
             }
-            if (Counter == 2)
+            
+            if (!text.Contains("A")) // If A is not in the text cards are available to read, as per casino protocol
             {
-                thuh = 0; // when this hits it has already fucked up
-            }
-            if (Counter == 1)
-            {
-                thuh = 0;
-            }
-            if (!text.Contains("A")) // counter needed to make sure hand numbers are synced
-            {
-                File.AppendAllText(DebugBotPath, "Hand not available " + text + System.Environment.NewLine);
-                HandFetched = false;
-                return;
-                
-                // HandFetched = false;
                 // File.AppendAllText(DebugBotPath, "Hand not available " + text + System.Environment.NewLine);
-                // return;
+                HandFetched = false;
+                return; //returning because cards are not here
             }
-
-            int handNumber = Convert.ToInt32(Regex.Match(text, @"\d+").Value);
-
-
-            //if (counter != handNumber) // counter needed to make sure hand numbers are synced
-            //{
-            //    HandFetched = false;
-            //    File.AppendAllText(DebugBotPath, counter + " doesnt equal " + handNumber + System.Environment.NewLine); // this is a hack, its still skipping hands but at least i am catching back up
-            //    return;
-            //}
 
             Hand = GetWholeCardsAndPosition(text);
             HandFetched = true;
             ++Counter;
-            File.AppendAllText(DebugBotPath, "Bot File ready.\nCards = \t" + text + "\nHole cards converted: " + Hand + System.Environment.NewLine);
+            //File.AppendAllText(DebugBotPath, "Bot File ready.\nCards = \t" + text + "\nHole cards converted: " + Hand + System.Environment.NewLine);
             foreach (DictionaryEntry elem in ranking) //Gets Rank
             {
                 if (Hand[0] == Hand[1])//different algorithm for pairs.
@@ -281,255 +255,19 @@ namespace Samus
             }
             if (rank > 0)
             {
-                File.AppendAllText(DebugBotPath, "Rank Found:\t" + rank + System.Environment.NewLine);
+                // File.AppendAllText(DebugBotPath, "Rank Found:\t" + rank + System.Environment.NewLine); // degging only
             }
             else
-                throw new Exception("No rank found, sort out");
+                throw new Exception("No rank found, Further testing needed on hash table elements");
         }
-
-        /*
-        private static void PopulatePlayer(Samus.Player johnny)
-        {
-            i = -1;
-
-            foreach (var element in Cards)
-            {
-                ++i;
-                switch (element.ToString())
-                {
-                    case "0":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "2";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "2";
-                            continue;
-                        }
-
-                    case "1":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "3";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "3";
-                            continue;
-                        }
-
-                    case "2":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "4";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "4";
-                            continue;
-                        }
-
-                    case "3":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "5";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "5";
-                            continue;
-                        }
-
-                    case "4":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "6";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "6";
-                            continue;
-                        }
-
-                    case "5":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "7";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "7";
-                            continue;
-                        }
-
-                    case "6":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "8";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "8";
-                            continue;
-                        }
-
-                    case "7":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "9";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "9";
-                            continue;
-                        }
-
-                    case "8":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "10";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "10";
-                            continue;
-                        }
-
-                    case "9":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "J";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "J";
-                            continue;
-                        }
-
-                    case "10":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "Q";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "Q";
-                            continue;
-                        }
-
-                    case "11":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "K";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "K";
-                            continue;
-                        }
-
-                    case "12":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "A";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "A";
-                            continue;
-                        }
-
-                    default:
-                        throw new ArgumentOutOfRangeException("Card value does not exist. Re-check input.");
-
-                }
-            }
-
-            i = -1;
-            foreach (var element in Suits)
-            {
-                ++i;
-                switch (element.ToString())
-                {
-                    case "0":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "s";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "s";
-                            continue;
-                        }
-
-                    case "1":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "c";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "c";
-                            continue;
-                        }
-
-                    case "2":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "h";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "h";
-                            continue;
-                        }
-
-                    case "3":
-                        if (i == 0)
-                        {
-                            johnny.FirstCardTest += "d";
-                            continue;
-                        }
-                        else
-                        {
-                            johnny.SecondCardTest += "d";
-                            continue;
-                        }
-
-                    default:
-                        throw new ArgumentOutOfRangeException("Suit value does not exist. Re-check input.");
-                }
-
-            }
-            i = -1;
-        }
-
-        */
-
+        
         private static string GetWholeCardsAndPosition(string text)
         {
             int firstCard = 0;
             int secondCard = 0;
             var index = 0;
 
-            foreach (var digit in text)
+            foreach (var digit in text) //extract needed information
             {
                 ++index;
                 if (digit == 'D')
@@ -547,18 +285,16 @@ namespace Samus
                 }
             }
 
-
-            Cards[0] = firstCard / 4;
+            Cards[0] = firstCard / 4; //card exposition as per casino protocol
             Cards[1] = secondCard / 4;
 
             Suits[0] = firstCard % 4;
             Suits[1] = secondCard % 4;
 
-
             Samus.SetPreFlopCards(Cards, Suits);
 
             string hand = null;
-            if (Samus.FirstCard.face == "10" && Samus.SecondCard.face == "10")
+            if (Samus.FirstCard.face == "10" && Samus.SecondCard.face == "10") //some madness with tens in build so checks will be made regularly
             {
                 hand = "TT";
             }
@@ -584,26 +320,5 @@ namespace Samus
 
             return hand;
         }
-
-        /*
-        
-            IStringCardsHolder[] players1 =
-            {
-                new Program.Player("Johnny", deck1.DealCard().ToString(), deck1.DealCard().ToString(), CommunityCards[0], CommunityCards[1], CommunityCards[2], CommunityCards[3], CommunityCards[4]),
-                new Player("Coralie", deck1.DealCard().ToString(), deck1.DealCard().ToString(), CommunityCards[0], CommunityCards[1], CommunityCards[2], CommunityCards[3], CommunityCards[4] ),
-            };
-
-            // foreach (var p in HandEvaluators.Evaluate(players1))
-            // {
-            //   
-            //     //Console.WriteLine("{0}: {1} -> {2}" + "    " + count, p.Rank == int.MaxValue ? "  " : p.Rank.ToString(), ((Player)p.CardsHolder).Name, p.Evaluation);
-            // }
-
-            foreach (var p in HandEvaluators.Evaluate(players1).SelectMany(x => x))
-            {
-               
-                    break;
-                }
-            }*/
     }
 }

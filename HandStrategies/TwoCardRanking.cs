@@ -4,7 +4,10 @@ namespace Samus
 {
     class TwoCardRanking
     {
-        //Class to evaluate starting hands, based on profit, ref. FTP
+        /// <summary>
+        /// //Class to evaluate starting hands, based on profit from a referenced source
+        /// </summary>
+        /// <param name="ranking"></param>
         internal static void PopulateHashTable(Hashtable ranking) //redo for limit holdem
         {
             ranking.Add("1", "AAo");

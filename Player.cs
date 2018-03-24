@@ -4,11 +4,7 @@ namespace Samus
 {
     public class Player
     {
-        public int Stack = 10000;
         public int Rank;
-
-        public double Tolerance;
-
         public string Name;
         public string Hand;
 
@@ -21,15 +17,12 @@ namespace Samus
         public bool BackDoorStraightDraw;
         public bool OpenEndedStraightDraw;
         public bool GutShotStraightDraw;
-        internal int position;
-
-
-
-        /*
-         * options for speed
-         * add card ranks reduces the need to check for straights/flushes 
-         * 
-         */
+        
+        /// <summary>
+        /// Sorting cards into readable faces and suits for pre-flop evaluation
+        /// </summary>
+        /// <param name="cards"></param>
+        /// <param name="suits"></param>
         public void SetPreFlopCards(object[] cards, object[] suits)
         {
             string cardOne = null;
@@ -37,10 +30,9 @@ namespace Samus
             string cardSuitOne = null;
             string cardSuitTwo = null;
 
-            switch (cards[0].ToString())
+            switch (cards[0].ToString()) //switch statement for efficiency
             {
                 case "0":
-
                     cardOne = "2";
                     break;
 
@@ -73,7 +65,7 @@ namespace Samus
                     break;
 
                 case "8":
-                    cardOne = "10"; //TODO: check if its T or 10
+                    cardOne = "10"; 
                     break;
 
                 case "9":
@@ -102,7 +94,6 @@ namespace Samus
                 case "0":
                     cardTwo = "2";
                     break;
-
 
                 case "1":
                     cardTwo = "3";
@@ -133,7 +124,7 @@ namespace Samus
                     break;
 
                 case "8":
-                    cardTwo = "10"; //TODO: check if its T or 10
+                    cardTwo = "10"; 
                     break;
 
                 case "9":
@@ -196,25 +187,6 @@ namespace Samus
         public Player(String name)
         {
             Name = name; 
-        }
-        public void PayPot(int amount)
-        {
-            this.Stack = this.Stack - amount;
-            Program.Pot += amount;
-        }
-        
-
-        /// <summary>
-        /// Deals alternative whole cards to all players.
-        /// </summary>
-        /// <param name="players"></param>
-        /// <param name="deck"></param>
-        internal static void SetWholeCards(Player[] players, Deck deck)
-        {
-            players[0].FirstCard = deck.DealCard();
-            players[1].FirstCard = deck.DealCard();
-            players[0].SecondCard = deck.DealCard();
-            players[1].SecondCard = deck.DealCard();
         }
     }
 }
