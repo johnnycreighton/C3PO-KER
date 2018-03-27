@@ -4,14 +4,16 @@
 
 Texas Hold'em Poker Bot (Samus)
 
-Written in C# it will be capable of beating the four generic noob poker players,
-such as 
+Written in C# it will be capable of beating the three generic noob poker players,
 "The Fish" (will pay to catch a card),
-"The Station" (Calls with any hand),
-"The Nit" (only plays the top 5% of hands),
-"The Maniac" (liable to do anything),
-"Random" (<--- duh)
+"The Random Bot" (will make decisions erratically)
+"The Maniac" (liable to do anything, very aggressive),
 
-Original idea was to play heads up hands with a stack of 10,000, (stacks regenerate to 10,000 after every hand).
+In its current state it is playing 6 handed play.
+Since its completion has beaten two man made bots
+
+
+Is playable inside a casino in the location -> https://github.com/beaverbusy/pokercasino 
+
 
 Dependancises BluffinMuffin.HandEvaluator
