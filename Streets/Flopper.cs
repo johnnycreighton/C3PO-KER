@@ -65,12 +65,17 @@ namespace Samus
                 File.WriteAllText(BotToCasino, "c");
                 //  File.AppendAllText(debugBotPath, "Changed bot file to 'c'. because i raised pre-flop." + System.Environment.NewLine);
             }
-            else
+            if(FileManipulation.Extractions.RaiseFound())
             {
-                File.WriteAllText(BotToCasino, "f");
+
+                File.WriteAllText(BotToCasino, "f"); // f
                 //  File.AppendAllText(debugBotPath, "Changed bot file to 'f'. I missed the flop COMPLETELY. + System.Environment.NewLine);
                 Program.Folded = true;
                 return;
+            }
+            else
+            {
+                File.WriteAllText(BotToCasino, "c"); // f
             }
 
             while (true)

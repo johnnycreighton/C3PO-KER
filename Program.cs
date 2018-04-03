@@ -15,9 +15,9 @@ namespace Samus
         public static Samus.Player Samus = new Samus.Player("Samus"); //player creation
 
        // public static string DebugBotPath = @"Specify path to casino files";
-        public static string CasinoToBot = @"Specify Path to casino files";
-        public static string BotToCasino = @"Specify Path to casino files";
-        public static string BotDirPath = @"Specify Path to casino files";
+        public static string CasinoToBot = @"D:\4th Year CSSE\Samus\MosersCasino\botFiles\casinoToBot0";
+        public static string BotToCasino = @"D:\4th Year CSSE\Samus\MosersCasino\botFiles\botToCasino0";
+        public static string BotDirPath = @"D:\4th Year CSSE\Samus\MosersCasino\botFiles\";
         public static string Hand;
 
         public static int[] FlopCards = new int[3]; //low level card numbers
@@ -179,14 +179,14 @@ namespace Samus
         {
             while (true)
             {
-                if (rank < 48) //previous == 54
+                if (rank < 45) //previous == 54
                 {
                     action = 'r';
                     // File.AppendAllText(DebugBotPath, "Changed bot file to 'r'." + System.Environment.NewLine);
                     File.WriteAllText(BotToCasino, "r");
                     break;
                 }
-                else if (rank < 111)//previous == 93
+                else if (rank < 100)//previous == 93
                 {
                     action = 'c';
                     // File.AppendAllText(DebugBotPath, "Changed bot file to 'c'." + System.Environment.NewLine);

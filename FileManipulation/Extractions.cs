@@ -44,7 +44,7 @@ namespace Samus.FileManipulation
         /// <returns></returns>
         internal static int GetTurnCardNumber(string[] lines)
         {
-           // File.AppendAllText(Program.DebugBotPath, "Getting TURN card number..." + System.Environment.NewLine);
+            // File.AppendAllText(Program.DebugBotPath, "Getting TURN card number..." + System.Environment.NewLine);
 
             foreach (string line in lines) //try catch this
             {
@@ -71,12 +71,39 @@ namespace Samus.FileManipulation
                 if (line.Contains("FLOP"))
                 {
                     return Regex.Split(line, @"\D+"); //returns string array of numbers, which are the  flop cards.
-                }    
+                }
             }
-           // File.AppendAllText(Program.DebugBotPath, "Flop wasnt found, EXITING PROGRAM." + System.Environment.NewLine);
+            // File.AppendAllText(Program.DebugBotPath, "Flop wasnt found, EXITING PROGRAM." + System.Environment.NewLine);
             System.Environment.Exit(0);
             return null;
             //throw new Exception("FLOP not here. test this method.");
+        }
+
+        internal static bool RaiseFound()
+        {
+            string text = null;
+            here:
+            while (true)
+            {
+                if (IsFileReady(Program.CasinoToBot))
+                {
+                    try
+                    {
+                        text = File.ReadAllText(Program.CasinoToBot);
+                        break;
+                    }
+                    catch
+                    { goto here; }
+                }
+            }
+
+            string endString = text.Substring(text.Length-4);
+
+            if (endString.Contains("r"))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

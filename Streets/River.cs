@@ -45,9 +45,15 @@ namespace Samus
                         Program.Folded = true;
                         return;
                     }
-                    else
+                    if(FileManipulation.Extractions.RaiseFound())
                     {
                         File.WriteAllText(BotToCasino, "f"); //TODO change to fold after
+                        //   File.AppendAllText(debugBotPath, "Changed bot file to 'f'. Hit nothing - why did i make it this far into the hand." + System.Environment.NewLine);
+                        return;
+                    }
+                    else
+                    {
+                        File.WriteAllText(BotToCasino, "c"); //TODO change to fold after
                         //   File.AppendAllText(debugBotPath, "Changed bot file to 'f'. Hit nothing - why did i make it this far into the hand." + System.Environment.NewLine);
                         break;
                     }

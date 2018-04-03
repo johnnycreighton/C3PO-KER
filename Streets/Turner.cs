@@ -61,7 +61,7 @@ namespace Samus.Streets
             }
             else
             {
-                File.WriteAllText(BotToCasino, "f");
+                File.WriteAllText(BotToCasino, "c"); //f
                 //   File.AppendAllText(debugBotPath, "Changed bot file to 'f'. I missed the Turn COMPLETELY" + System.Environment.NewLine);
                 Program.Folded = true;
                 return;
